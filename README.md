@@ -1,5 +1,4 @@
-# sit
-SIT - Svn with gIT extensions
+# SIT - Svn with gIT extensions
 
 written by Joachim Lechner
 
