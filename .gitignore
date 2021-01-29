@@ -1,2 +1,4 @@
 *.pyc
-
+tests/*.tmp
+tests/sit_cmd.sh
+tests/test_*
