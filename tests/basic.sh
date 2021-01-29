@@ -10,6 +10,7 @@ set -e
 
 source ./scripts/setup.sh
 source ./scripts/helper_functions.sh
+source ./sit_cmd.sh
 
 setup_path "${PREFIX_EXAMPLE_PATH}_basic" "Setup basic"
 
@@ -19,50 +20,50 @@ setup_path "${PREFIX_EXAMPLE_PATH}_basic" "Setup basic"
 cd user1/
 
 ######################
-execute "sit status" "show status"
-execute "sit branch" "show branches"
+execute "$SIT status" "show status"
+execute "$SIT branch" "show branches"
 
 ######################
 touch t
-execute "sit add t"
-execute "sit commit -m \"test\""
-execute "sit update"
-execute "sit status"
+execute "$SIT add t"
+execute "$SIT commit -m \"test\""
+execute "$SIT update"
+execute "$SIT status"
 
 ######################
-execute "sit branch testbranch -m \"testbranch\""
-execute "sit branch testbranch2 -a"
+execute "$SIT branch testbranch -m \"testbranch\""
+execute "$SIT branch testbranch2 -a"
 
-execute "sit checkout testbranch2"
+execute "$SIT checkout testbranch2"
 
 touch t2
-execute "sit add t2"
-execute "sit commit -m \"testbranch\""
+execute "$SIT add t2"
+execute "$SIT commit -m \"testbranch\""
 
 touch t3
-execute "sit update"
-execute "sit add t3"
-execute "sit stash push 'test'"
-execute "sit status"
+execute "$SIT update"
+execute "$SIT add t3"
+execute "$SIT stash push 'test'"
+execute "$SIT status"
 
-execute "sit branch"
+execute "$SIT branch"
 
-execute "sit stash list"
+execute "$SIT stash list"
 
 touch t4
-execute "sit add t4"
-execute "sit stash push 'test2'"
+execute "$SIT add t4"
+execute "$SIT stash push 'test2'"
 
-#execute "sit stash apply 'test'"
-execute "sit stash list"
-execute "sit stash pop 'test'"
-execute "sit status"
+#execute "$SIT stash apply 'test'"
+execute "$SIT stash list"
+execute "$SIT stash pop 'test'"
+execute "$SIT status"
 
 execute "svn ls ^/stashes"
 
-#execute "sit diff trunk -t diff -v --debug "
-#execute "sit diff trunk -t meld -v --debug "
-#execute "sit diff trunk -v --debug"
-execute "sit diff trunk -t diff"
+#execute "$SIT diff trunk -t diff -v --debug "
+#execute "$SIT diff trunk -t meld -v --debug "
+#execute "$SIT diff trunk -v --debug"
+execute "$SIT diff trunk -t diff"
 #
-#execute "sit branch"
+#execute "$SIT branch"

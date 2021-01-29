@@ -11,6 +11,7 @@ default: $(TARGETS)
 CWD:=$(shell pwd)
 
 %.log: %.sh
+	echo "SIT=\"python $(CWD)/../sit.py\"" > sit_cmd.sh
 	./$< | tee $@.tmp
 	cat $@.tmp | sed "s,$(CWD),\.\.\.,g" | sed "s,$(USER),<user>,g" > $@
 
