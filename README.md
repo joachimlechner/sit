@@ -7,14 +7,16 @@ Licence: GNU GENERAL PUBLIC LICENSE, Version 2, June 1991
 
 ## The idea
 Subversion (svn) misses some neat features that git supports, which were tried to port over with this project.
-The basic idea is to have a wrapper script arround svn for easy usage.
+The basic idea is to have a wrapper script arround svn for easy usage of svn.
 
+### Features
 Here some of the implemented features
 * all commands operate in all sub folders with the branch root not the actual sub folder
 * address branches by <branch_name> only (no requirement for ^/...)
 * graphical directory diff (git difftool -d)
 * stashing (git stash) per user
 
+### Limitations
 To support this some limitations are taken into account:
 * default svn directory structure
   ^/trunk
@@ -70,4 +72,17 @@ List all available stashes
 * .svnignores
 * setup - create basic environemnt
 * forward some missing svn commands to be able to complete need to use the svn command
+
+### Requirements
+Python 2.7 upwards
+Note that with python 3.x inquirer package is used for branch selection
+Subversion >= 1.7 (carret notation (^/trunk), single .svn folder in main repo (at least its not tested from my side))
+
+### Installation
+
+Include this path in the PYTHONPATH variable.
+
+An alias to the main script sit.py should also be fine.
+
+alias sit=<THIS_PATH>/sit.py
 
