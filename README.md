@@ -1,5 +1,5 @@
 # sit
-SIT - Svn with gIT extensions, test suite
+SIT - Svn with gIT extensions
 
 written by Joachim Lechner
 
