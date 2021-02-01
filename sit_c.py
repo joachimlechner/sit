@@ -37,6 +37,7 @@ class sit_c:
     relative_path = "" 
     repository_revision = ""
     sandbox_revision = ""
+    project_path = "" 
     branch_type = "" 
     branch_name = ""
     branch_types = ['trunk', 'branches', 'tags', 'releases']
@@ -118,15 +119,17 @@ class sit_c:
             self.relative_branch_root_url = "/".join(relative_branch_root_url_list[::-1])
 
             # decode type and branch name
-            p = re.compile('\^/(' + '|'.join(self.branch_types) + ')/([^/]+)')
+            p = re.compile('^(\^/([^\^]*|))(' + '|'.join(self.branch_types) + ')/([^/]+)(/|)$')
             m = p.match(self.relative_url)
             if m:
-                self.branch_type = str(m.group(1))
-                self.branch_name = str(m.group(2))
+                self.project_path = str(m.group(1))
+                self.branch_type  = str(m.group(3))
+                self.branch_name  = str(m.group(4))
             else:
-                p = re.compile('\^/trunk(/|)')
+                p = re.compile('^(\^/([^\^]*|))trunk(/|)$')
                 m = p.match(self.relative_url)
                 if m:
+                    self.project_path = str(m.group(1))
                     self.branch_type = "trunk"
                     self.branch_name = "trunk"
                 else:
@@ -144,6 +147,7 @@ class sit_c:
             print("Repository Revision:    " + self.repository_revision)
             print("Working copy root path: " + self.sandbox_root_path)
             print("Sandbox Revision:       " + self.sandbox_revision)
+            print("project path:           " + self.project_path)
             print("branch type:            " + self.branch_type)
             print("branch name:            " + self.branch_name)           
             print("---------------------------------------")
@@ -201,9 +205,9 @@ class sit_c:
     ###############################################################
     def get_branch_repository_url(self, branch_name, branch_type):
         if branch_name in self.trunk_names:
-            return '^/' + self.default_trunk_name
+            return self.project_path + self.default_trunk_name
         else:
-            return '^/' + branch_type + '/' + branch_name
+            return self.project_path + branch_type + '/' + branch_name
 
     ###############################################################
     def get_branch_repository_url_merged(self, branch_type_and_name):
@@ -276,9 +280,9 @@ class sit_c:
             for i_branch_type in self.branch_types:
                 print(i_branch_type + ':')
                 if i_branch_type == "trunk":
-                    command = 'svn ls ' + self.repository_root + '| grep trunk/'
+                    command = 'svn ls ' + self.project_path + '| grep trunk/'
                 else:
-                    command = 'svn ls ' + self.repository_root + '/' + i_branch_type
+                    command = 'svn ls ' + self.project_path + '/' + i_branch_type
 
                 for branch_full_path in self.tools.run_external_command_and_get_results(command, parameters['verbose']):
                     p = re.compile(r'^([^/]+)/$')
@@ -376,9 +380,9 @@ class sit_c:
         branches = []
         for i_branch_type in branch_types:
             if i_branch_type == self.default_trunk_type:
-                command = 'svn ls ' + self.repository_root + '| grep trunk/'
+                command = 'svn ls ' + self.project_path + '| grep trunk/'
             else:
-                command = 'svn ls ' + self.repository_root + '/' + i_branch_type
+                command = 'svn ls ' + self.project_path + '/' + i_branch_type
 
             for branch_full_path in self.tools.run_external_command_and_get_results(command, verbose):
                 p = re.compile(r'^([^/]+)/$')
@@ -904,7 +908,7 @@ class sit_c:
     def get_new_stash_branch_name(self, name):
         # ^/stashes/<user>.<stash_name>.<branch_type>.<branch_name>
 
-        stash_base_path = "^/" + self.default_stash_folder + "/"
+        stash_base_path = self.project_path + self.default_stash_folder + "/"
 
         # find best match for unidentified name
         stashes = []
@@ -993,7 +997,7 @@ class sit_c:
 
     ###############################################################
     def get_stash_branches(self, username, verbose):
-        stash_base_path = "^/" + self.default_stash_folder + "/"
+        stash_base_path = self.project_path + self.default_stash_folder + "/"
 
         command = 'svn ls ' + stash_base_path
         stashes = {}

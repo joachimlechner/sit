@@ -1,0 +1,288 @@
+
+################################################
+# setup: Setup basic2
+.../test_basic2
+
+################################################
+# setup: create local repository (file system repository) server1
+.../test_basic2/server1
+
+################################################
+# setup: create local / sandbox repository
+.../test_basic2/server1_create
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_basic2/server1/repo .
+ |============================================================================
+Checked out revision 0.
+ '============================================================================
+
+A         project
+A         project/sub_project
+A         project/sub_project/sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+Adding         project
+Adding         project/sub_project
+Adding         project/sub_project/sub_sub_project
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+Transmitting file data .done
+Committing transaction...
+Committed revision 1.
+
+################################################
+# setup: 
+
+################################################
+# setup: create local / sandbox repository for user1
+.../test_basic2/user1
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_basic2/server1/repo/project/sub_project//sub_sub_project/sub_sub_sub_project//trunk .
+ |============================================================================
+A    .svnignore
+Checked out revision 1.
+ '============================================================================
+
+
+ .============================================================================
+ |             show status
+ | Executing:  python .../../sit.py status
+ |============================================================================
+Untracked
+  ?          scripts
+ '============================================================================
+
+
+ .============================================================================
+ |             show branches
+ | Executing:  python .../../sit.py branch
+ |============================================================================
+trunk:
+ * trunk
+branches:
+tags:
+releases:
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py add t
+ |============================================================================
+A         t
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py commit -m "test"
+ |============================================================================
+Adding         t
+Transmitting file data .done
+Committing transaction...
+Committed revision 2.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py update
+ |============================================================================
+Updating '.':
+At revision 2.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py status
+ |============================================================================
+Untracked
+  ?          scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py branch testbranch -m "testbranch"
+ |============================================================================
+Committing transaction...
+Committed revision 3.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py branch testbranch2 -a
+ |============================================================================
+Committing transaction...
+Committed revision 4.
+INFO: Repository and Sandbox Revision Missmatches. Select revision to branch from.
+What revision to branch from?
+ [0] 2
+Select by entering the number (0-0) or abort with 'q': Selected: [0] 2
+
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py checkout testbranch2
+ |============================================================================
+At revision 4.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py add t2
+ |============================================================================
+A         t2
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py commit -m "testbranch"
+ |============================================================================
+Adding         t2
+Transmitting file data .done
+Committing transaction...
+Committed revision 5.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py update
+ |============================================================================
+Updating '.':
+At revision 5.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py add t3
+ |============================================================================
+A         t3
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py stash push 'test'
+ |============================================================================
+Committing transaction...
+Committed revision 6.
+At revision 6.
+Adding         t3
+Transmitting file data .done
+Committing transaction...
+Committed revision 7.
+D    t3
+Updated to revision 5.
+INFO: Created stash <test>
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py status
+ |============================================================================
+Untracked
+  ?          scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py branch
+ |============================================================================
+trunk:
+   trunk
+branches:
+   <user>.testbranch
+ * <user>.testbranch2
+tags:
+releases:
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py stash list
+ |============================================================================
+[0] 18:34:09 01.02.2021 test branches/<user>.testbranch2 ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test#branches#<user>.testbranch2#2021.02.01.18_34_09/
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py add t4
+ |============================================================================
+A         t4
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py stash push 'test2'
+ |============================================================================
+Committing transaction...
+Committed revision 8.
+At revision 8.
+Adding         t4
+Transmitting file data .done
+Committing transaction...
+Committed revision 9.
+D    t4
+Updated to revision 5.
+INFO: Repository and Sandbox Revision Missmatches. Select revision to branch from.
+What revision to branch from?
+ [0] 5
+Select by entering the number (0-0) or abort with 'q': Selected: [0] 5
+
+INFO: Created stash <test2>
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py stash list
+ |============================================================================
+[0] 18:34:09 01.02.2021 test2 branches/<user>.testbranch2 ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test2#branches#<user>.testbranch2#2021.02.01.18_34_09/
+[1] 18:34:09 01.02.2021 test branches/<user>.testbranch2 ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test#branches#<user>.testbranch2#2021.02.01.18_34_09/
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py stash pop 'test'
+ |============================================================================
+--- Merging r7 into '.':
+A    t3
+--- Recording mergeinfo for merge of r7 into '.':
+ U   .
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py status
+ |============================================================================
+Changed
+  A          +    t3
+
+Untracked
+  ?          scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  svn ls ^/project/sub_project//sub_sub_project/sub_sub_sub_project//stashes
+ |============================================================================
+<user>#test#branches#<user>.testbranch2#2021.02.01.18_34_09/
+<user>#test2#branches#<user>.testbranch2#2021.02.01.18_34_09/
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py diff trunk -t diff
+ |============================================================================
+Only in /tmp/sit.diff.2021.02.01.18_34_11/from/: t2
+Only in /tmp/sit.diff.2021.02.01.18_34_11/from/: t3
+ '============================================================================
+
