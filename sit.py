@@ -63,7 +63,6 @@ def subcmd_stash_push(**parameters):
 if __name__ == '__main__':
     the_tools = tools_c() 
     the_sit = sit_c(os.path.abspath(os.getcwd()), the_tools) 
-    # the_sit.show()
 
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='subparser')
@@ -120,7 +119,7 @@ if __name__ == '__main__':
         parser_sit_diff = subparsers.add_parser('diff', help="Diff files between branches and/or revisions")
         # FIXME: sequence to use ?
         parser_sit_diff.add_argument('branch_branch_pathfile', nargs='*', help='Select the branch, branch2, and the file/path to diff. Note that branch=branch2 if only one branch is given, the default branch is the actual one! Items in (...) are optional ! No revision means head/actual status in case of branch is sandbox. Format: (((<branch_type>:)<branch>)(@<revison/prev/head>)) (((<branch2_type>:)<branch2>)(@<revison/prev>)) (<path/file>)')
-        parser_sit_diff.add_argument('-t', dest="diff_tool", nargs=1, default="kdiff3", help='The diff tool to use')
+        parser_sit_diff.add_argument('-t', dest="diff_tool", nargs=1, default=["kdiff3"], help='The diff tool to use. Supported are kdiff3/meld/diff. Default is kdiff3.')
         parser_sit_diff.add_argument('-d', dest="diff_dir", nargs=1, default="/tmp", help='The temporary directory for creating diff data')
         parser_sit_diff.add_argument('-v', dest="verbose", action='store_const', help='Verbose what is done', const=True, default=False)
         parser_sit_diff.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)

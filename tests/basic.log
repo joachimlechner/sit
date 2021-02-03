@@ -113,13 +113,13 @@ Committed revision 3.
  .============================================================================
  | Executing:  python .../../sit.py branch testbranch2 -a
  |============================================================================
-Committing transaction...
-Committed revision 4.
 INFO: Repository and Sandbox Revision Missmatches. Select revision to branch from.
 What revision to branch from?
  [0] 2
 Select by entering the number (0-0) or abort with 'q': Selected: [0] 2
 
+Committing transaction...
+Committed revision 4.
  '============================================================================
 
 
@@ -202,7 +202,7 @@ releases:
  .============================================================================
  | Executing:  python .../../sit.py stash list
  |============================================================================
-[0] 09:42:12 29.01.2021 test branches/<user>.testbranch2 ^/stashes/<user>#test#branches#<user>.testbranch2#2021.01.29.09_42_12/
+[0] 21:17:57 03.02.2021 test branches/<user>.testbranch2 ^/stashes/<user>#test#branches#<user>.testbranch2#2021.02.03.21_17_57/
  '============================================================================
 
 
@@ -216,6 +216,11 @@ A         t4
  .============================================================================
  | Executing:  python .../../sit.py stash push 'test2'
  |============================================================================
+INFO: Repository and Sandbox Revision Missmatches. Select revision to branch from.
+What revision to branch from?
+ [0] 5
+Select by entering the number (0-0) or abort with 'q': Selected: [0] 5
+
 Committing transaction...
 Committed revision 8.
 At revision 8.
@@ -225,11 +230,6 @@ Committing transaction...
 Committed revision 9.
 D    t4
 Updated to revision 5.
-INFO: Repository and Sandbox Revision Missmatches. Select revision to branch from.
-What revision to branch from?
- [0] 5
-Select by entering the number (0-0) or abort with 'q': Selected: [0] 5
-
 INFO: Created stash <test2>
  '============================================================================
 
@@ -237,8 +237,8 @@ INFO: Created stash <test2>
  .============================================================================
  | Executing:  python .../../sit.py stash list
  |============================================================================
-[0] 09:42:13 29.01.2021 test2 branches/<user>.testbranch2 ^/stashes/<user>#test2#branches#<user>.testbranch2#2021.01.29.09_42_13/
-[1] 09:42:12 29.01.2021 test branches/<user>.testbranch2 ^/stashes/<user>#test#branches#<user>.testbranch2#2021.01.29.09_42_12/
+[0] 21:17:58 03.02.2021 test2 branches/<user>.testbranch2 ^/stashes/<user>#test2#branches#<user>.testbranch2#2021.02.03.21_17_58/
+[1] 21:17:57 03.02.2021 test branches/<user>.testbranch2 ^/stashes/<user>#test#branches#<user>.testbranch2#2021.02.03.21_17_57/
  '============================================================================
 
 
@@ -266,15 +266,15 @@ Untracked
  .============================================================================
  | Executing:  svn ls ^/stashes
  |============================================================================
-<user>#test#branches#<user>.testbranch2#2021.01.29.09_42_12/
-<user>#test2#branches#<user>.testbranch2#2021.01.29.09_42_13/
+<user>#test#branches#<user>.testbranch2#2021.02.03.21_17_57/
+<user>#test2#branches#<user>.testbranch2#2021.02.03.21_17_58/
  '============================================================================
 
 
  .============================================================================
  | Executing:  python .../../sit.py diff trunk -t diff
  |============================================================================
-Only in /tmp/sit.diff.2021.01.29.09_42_15/from/: t2
-Only in /tmp/sit.diff.2021.01.29.09_42_15/from/: t3
+Only in /tmp/sit.diff.2021.02.03.21_18_00/from:sandbox/: t2
+Only in /tmp/sit.diff.2021.02.03.21_18_00/from:sandbox/: t3
  '============================================================================
 

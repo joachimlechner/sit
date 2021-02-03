@@ -1,0 +1,165 @@
+
+################################################
+# setup: Setup diff
+.../test_diff
+
+################################################
+# setup: create local repository (file system repository) server1
+.../test_diff/server1
+
+################################################
+# setup: create local / sandbox repository
+.../test_diff/server1_create
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_diff/server1/repo .
+ |============================================================================
+Checked out revision 0.
+ '============================================================================
+
+A         project
+A         project/sub_project
+A         project/sub_project/sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+Adding         project
+Adding         project/sub_project
+Adding         project/sub_project/sub_sub_project
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+Transmitting file data .done
+Committing transaction...
+Committed revision 1.
+
+################################################
+# setup: 
+
+################################################
+# setup: create local / sandbox repository for user1
+.../test_diff/user1
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_diff/server1/repo/project/sub_project//sub_sub_project/sub_sub_sub_project//trunk .
+ |============================================================================
+A    .svnignore
+Checked out revision 1.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py add test test_file4
+ |============================================================================
+A         test
+A         test/test_file1
+A         test/test_file2
+A         test/sub_test
+A         test/sub_test/test_file3
+A         test/sub_test2
+A         test_file4
+ '============================================================================
+
+
+ .============================================================================
+ |             show status
+ | Executing:  python .../../sit.py status
+ |============================================================================
+Changed
+  A          test
+  A          test/sub_test
+  A          test/sub_test/test_file3
+  A          test/sub_test2
+  A          test/test_file1
+  A          test/test_file2
+  A          test_file4
+
+Untracked
+  ?          scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py commit . -m 'test blabla'
+ |============================================================================
+Adding         test
+Adding         test/sub_test
+Adding         test/sub_test/test_file3
+Adding         test/sub_test2
+Adding         test/test_file1
+Adding         test/test_file2
+Adding         test_file4
+Transmitting file data ....done
+Committing transaction...
+Committed revision 2.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  svn update
+ |============================================================================
+Updating '.':
+At revision 2.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  svn rm test_file1
+ |============================================================================
+D         test_file1
+ '============================================================================
+
+
+ .============================================================================
+ |             show status
+ | Executing:  python .../../sit.py status
+ |============================================================================
+Changed
+  D          ../../test/test_file1
+  M          ../../test/test_file2
+
+Untracked
+  ?          ../../scripts
+ '============================================================================
+
+
+ .============================================================================
+ |             show status
+ | Executing:  python .../../sit.py status .
+ |============================================================================
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  pwd
+ |============================================================================
+.../test_diff/user1/test/sub_test
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py diff -t diff
+ |============================================================================
+Only in /tmp/sit.diff.2021.02.03.21_18_01/to:trunk@2/test: test_file1
+diff -r /tmp/sit.diff.2021.02.03.21_18_01/to:trunk@2/test/test_file2 /tmp/sit.diff.2021.02.03.21_18_01/from:sandbox/test/test_file2
+1c1
+< test_data2
+---
+> test_data2a
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py diff -t diff .
+ |============================================================================
+No changes detected between paths <.../test_diff/user1//test/sub_test> and <^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk//test/sub_test@2>.
+ '============================================================================
+

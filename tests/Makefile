@@ -5,6 +5,7 @@
 
 TARGETS=
 TARGETS+=basic.log
+TARGETS+=diff.log
 
 default: $(TARGETS)
 
