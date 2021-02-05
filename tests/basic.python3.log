@@ -1,0 +1,339 @@
+
+################################################
+# setup: Setup basic
+.../test_basic
+
+################################################
+# setup: create local repository (file system repository) server1
+.../test_basic/server1
+
+################################################
+# setup: create local / sandbox repository
+.../test_basic/server1_create
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_basic/server1/repo .
+ |============================================================================
+Checked out revision 0.
+ '============================================================================
+
+A         trunk
+A         branches
+A         tags
+A         releases
+A         stashes
+A         .svnignore
+Adding         branches
+Adding         releases
+Adding         stashes
+Adding         tags
+Adding         trunk
+Adding         trunk/.svnignore
+Transmitting file data .done
+Committing transaction...
+Committed revision 1.
+
+################################################
+# setup: 
+
+################################################
+# setup: create local / sandbox repository for user1
+.../test_basic/user1
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_basic/server1/repo/trunk .
+ |============================================================================
+A    .svnignore
+Checked out revision 1.
+ '============================================================================
+
+
+ .============================================================================
+ |             show status
+ | Executing:  python3 .../../sit.py status
+ |============================================================================
+
+> Untracked:
+  ?          scripts
+ '============================================================================
+
+
+ .============================================================================
+ |             show branches
+ | Executing:  python3 .../../sit.py branch
+ |============================================================================
+trunk:
+ * trunk
+branches:
+tags:
+releases:
+stashes:
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py add t
+ |============================================================================
+> Adding ...
+A         t
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py commit -m "test"
+ |============================================================================
+Adding         t
+Transmitting file data .done
+Committing transaction...
+Committed revision 2.
+> Committing data in . ...
+> Updating ...
+Updating '.':
+At revision 2.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py update
+ |============================================================================
+> Updating ...
+Updating '.':
+At revision 2.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py status
+ |============================================================================
+
+> Untracked:
+  ?          scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py branch testbranch -m "testbranch"
+ |============================================================================
+Committing transaction...
+Committed revision 3.
+> Copying ^/trunk@2 to ^/branches/<user>.testbranch ...
+ '============================================================================
+
+
+ .============================================================================
+ |             ATTENTION: press ENTER to continue !!!
+ | Executing:  python3 .../../sit.py branch testbranch2 -a
+ |============================================================================
+INFO: Repository and Sandbox Revision Missmatches. Select revision to branch from.
+
+[?] What revision to branch from?: 2
+ > 2
+Committing transaction...
+Committed revision 4.
+
+> Copying ^/trunk@2 to ^/branches/<user>.testbranch2 ...
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py checkout testbranch2
+ |============================================================================
+> Checking out ^/branches/<user>.testbranch2@HEAD ...
+At revision 4.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py add t2
+ |============================================================================
+> Adding ...
+A         t2
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py commit -m "testbranch"
+ |============================================================================
+Adding         t2
+Transmitting file data .done
+Committing transaction...
+Committed revision 5.
+> Committing data in . ...
+> Updating ...
+Updating '.':
+At revision 5.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py update
+ |============================================================================
+> Updating ...
+Updating '.':
+At revision 5.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py add t3
+ |============================================================================
+> Adding ...
+A         t3
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py stash push 'test' -a
+ |============================================================================
+Committing transaction...
+Committed revision 6.
+Adding         t3
+Transmitting file data .done
+Committing transaction...
+Committed revision 7.
+> Copying ^/branches/<user>.testbranch2@5 to ^/stashes/<user>#test#branches#<user>.testbranch2#<DATE_TIME> ...
+> Checking out ^/stashes/<user>#test#branches#<user>.testbranch2#<DATE_TIME>@HEAD ...
+At revision 6.
+> Committing data in . ...
+> Checking out ^/branches/<user>.testbranch2@5 ...
+D    t3
+Updated to revision 5.
+> Created stash <test>:
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py status
+ |============================================================================
+
+> Untracked:
+  ?          scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py branch
+ |============================================================================
+trunk:
+   trunk
+branches:
+   <user>.testbranch
+ * <user>.testbranch2
+tags:
+releases:
+stashes:
+   <user>#test#branches#<user>.testbranch2#<DATE_TIME>
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py stash list
+ |============================================================================
+[0] <TIME> <DATE> test branches/<user>.testbranch2 ^/stashes/<user>#test#branches#<user>.testbranch2#<DATE_TIME>/
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py add t4
+ |============================================================================
+> Adding ...
+A         t4
+ '============================================================================
+
+
+ .============================================================================
+ |             ATTENTION: press ENTER to continue !!!
+ | Executing:  python3 .../../sit.py stash push 'test2' -a
+ |============================================================================
+INFO: Repository and Sandbox Revision Missmatches. Select revision to branch from.
+
+[?] What revision to branch from?: 5
+ > 5
+Committing transaction...
+Committed revision 8.
+Adding         t4
+Transmitting file data .done
+Committing transaction...
+Committed revision 9.
+
+> Copying ^/branches/<user>.testbranch2@5 to ^/stashes/<user>#test2#branches#<user>.testbranch2#<DATE_TIME> ...
+> Checking out ^/stashes/<user>#test2#branches#<user>.testbranch2#<DATE_TIME>@HEAD ...
+At revision 8.
+> Committing data in . ...
+> Checking out ^/branches/<user>.testbranch2@5 ...
+D    t4
+Updated to revision 5.
+> Created stash <test2>:
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py stash list
+ |============================================================================
+[0] <TIME> <DATE> test2 branches/<user>.testbranch2 ^/stashes/<user>#test2#branches#<user>.testbranch2#<DATE_TIME>/
+[1] <TIME> <DATE> test branches/<user>.testbranch2 ^/stashes/<user>#test#branches#<user>.testbranch2#<DATE_TIME>/
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py stash pop 'test'
+ |============================================================================
+Reverted '.'
+> Merging from ^/stashes/<user>#test#branches#<user>.testbranch2#<DATE_TIME>/ ...
+--- Merging r7 into '.':
+A    t3
+--- Recording mergeinfo for merge of r7 into '.':
+ U   .
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py status
+ |============================================================================
+> Changed:
+   A  +      t3
+
+> Untracked:
+  ?          scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  svn ls ^/stashes
+ |============================================================================
+<user>#test#branches#<user>.testbranch2#<DATE_TIME>/
+<user>#test2#branches#<user>.testbranch2#<DATE_TIME>/
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py diff trunk -t diff
+ |============================================================================
+> Detecting folders ...
+> Detected 0 folders in from:
+> Detected 0 folders in to:
+> Finding differences ...
+> Detected 2 changed elements in from:
+> Detected 0 changed elements in to:
+> Detected 0 not mached elements:
+> Showing differences ...
+Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: t2
+Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: t3
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py branch
+ |============================================================================
+trunk:
+   trunk
+branches:
+   <user>.testbranch
+ * <user>.testbranch2
+tags:
+releases:
+stashes:
+   <user>#test#branches#<user>.testbranch2#<DATE_TIME>
+   <user>#test2#branches#<user>.testbranch2#<DATE_TIME>
+ '============================================================================
+

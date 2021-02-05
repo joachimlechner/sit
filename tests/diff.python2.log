@@ -1,18 +1,18 @@
 
 ################################################
-# setup: Setup stash
-.../test_stash
+# setup: Setup diff
+.../test_diff
 
 ################################################
 # setup: create local repository (file system repository) server1
-.../test_stash/server1
+.../test_diff/server1
 
 ################################################
 # setup: create local / sandbox repository
-.../test_stash/server1_create
+.../test_diff/server1_create
 
  .============================================================================
- | Executing:  svn checkout file://.../test_stash/server1/repo .
+ | Executing:  svn checkout file://.../test_diff/server1/repo .
  |============================================================================
 Checked out revision 0.
  '============================================================================
@@ -46,10 +46,10 @@ Committed revision 1.
 
 ################################################
 # setup: create local / sandbox repository for user1
-.../test_stash/user1
+.../test_diff/user1
 
  .============================================================================
- | Executing:  svn checkout file://.../test_stash/server1/repo/project/sub_project//sub_sub_project/sub_sub_sub_project//trunk .
+ | Executing:  svn checkout file://.../test_diff/server1/repo/project/sub_project//sub_sub_project/sub_sub_sub_project//trunk .
  |============================================================================
 A    .svnignore
 Checked out revision 1.
@@ -61,11 +61,11 @@ Checked out revision 1.
  |============================================================================
 > Adding ...
 A         test
+A         test/test_file2
+A         test/sub_test
+A         test/sub_test/test_file3
 A         test/sub_test2
 A         test/test_file1
-A         test/test_file2
-A         test/sub_test1
-A         test/sub_test1/sub_test1_file1
 A         test_file4
  '============================================================================
 
@@ -76,8 +76,8 @@ A         test_file4
  |============================================================================
 > Changed:
    A         test
-   A         test/sub_test1
-   A         test/sub_test1/sub_test1_file1
+   A         test/sub_test
+   A         test/sub_test/test_file3
    A         test/sub_test2
    A         test/test_file1
    A         test/test_file2
@@ -92,8 +92,8 @@ A         test_file4
  | Executing:  python .../../sit.py commit . -m 'test blabla'
  |============================================================================
 Adding         test
-Adding         test/sub_test1
-Adding         test/sub_test1/sub_test1_file1
+Adding         test/sub_test
+Adding         test/sub_test/test_file3
 Adding         test/sub_test2
 Adding         test/test_file1
 Adding         test/test_file2
@@ -109,73 +109,27 @@ At revision 2.
 
 
  .============================================================================
- | Executing:  python .../../sit.py add sub_test1_file2
+ | Executing:  svn update
  |============================================================================
-> Adding ...
-A         sub_test1_file2
+Updating '.':
+At revision 2.
  '============================================================================
 
 
  .============================================================================
- | Executing:  python .../../sit.py rm sub_test1_file1
+ | Executing:  svn rm test_file1
  |============================================================================
-D         sub_test1_file1
+D         test_file1
  '============================================================================
 
 
  .============================================================================
- | Executing:  python .../../sit.py remove ../test_file1
- |============================================================================
-D         .../test_stash/user1/test/test_file1
- '============================================================================
-
-.../test_stash/user1/test/sub_test1
-
- .============================================================================
- | Executing:  python .../../sit.py stash push test_stash -a
- |============================================================================
-Committing transaction...
-Committed revision 3.
-Deleting       test/sub_test1/sub_test1_file1
-Adding         test/sub_test1/sub_test1_file2
-Deleting       test/test_file1
-Transmitting file data .done
-Committing transaction...
-Committed revision 4.
-> Copying ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@2 to ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test_stash#trunk#trunk#<DATE_TIME> ...
-> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test_stash#trunk#trunk#<DATE_TIME>@HEAD ...
-At revision 3.
-> Committing data in ../.. ...
-> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@2 ...
-D    sub_test1_file2
-A    sub_test1_file1
-A    .../test_stash/user1/test/test_file1
-Updated to revision 2.
-> Created stash <test_stash>:
- '============================================================================
-
-
- .============================================================================
- | Executing:  python .../../sit.py stash apply test_stash
- |============================================================================
-Reverted '.../test_stash/user1'
-> Merging from ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test_stash#trunk#trunk#<DATE_TIME>/ ...
---- Merging r4 into '.../test_stash/user1':
-A    sub_test1_file2
-D    sub_test1_file1
-D    .../test_stash/user1/test/test_file1
---- Recording mergeinfo for merge of r4 into '.../test_stash/user1':
- U   .../test_stash/user1
- '============================================================================
-
-
- .============================================================================
- | Executing:  sit status
+ |             show status
+ | Executing:  python .../../sit.py status
  |============================================================================
 > Changed:
-   D         ../../test/sub_test1/sub_test1_file1
-   A  +      ../../test/sub_test1/sub_test1_file2
    D         ../../test/test_file1
+   M         ../../test/test_file2
 
 > Untracked:
   ?          ../../scripts
@@ -183,26 +137,49 @@ D    .../test_stash/user1/test/test_file1
 
 
  .============================================================================
- | Executing:  svn status ../../
+ |             show status
+ | Executing:  python .../../sit.py status .
  |============================================================================
-?       ../../scripts
-D       ../../test/sub_test1/sub_test1_file1
-A  +    ../../test/sub_test1/sub_test1_file2
-D       ../../test/test_file1
  '============================================================================
 
 
  .============================================================================
- | Executing:  python .../../sit.py stash list
+ | Executing:  pwd
  |============================================================================
-[0] <TIME> <DATE> test_stash trunk/trunk ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test_stash#trunk#trunk#<DATE_TIME>/
+.../test_diff/user1/test/sub_test
  '============================================================================
 
 
  .============================================================================
- | Executing:  python .../../sit.py stash drop test_stash -a
+ | Executing:  python .../../sit.py diff -t diff
  |============================================================================
-Committing transaction...
-Committed revision 5.
+> Detecting folders ...
+> Detected 3 folders in from:
+> Detected 3 folders in to:
+> Finding differences ...
+> Detected 1 changed elements in from:
+> Detected 2 changed elements in to:
+> Detected 0 not mached elements:
+> Showing differences ...
+Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test: test_file1
+diff -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
+1c1
+< test_data2
+---
+> test_data2a
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py diff -t diff .
+ |============================================================================
+> Detecting folders ...
+> Detected 0 folders in from:
+> Detected 0 folders in to:
+> Finding differences ...
+> Detected 0 changed elements in from:
+> Detected 0 changed elements in to:
+> Detected 0 not mached elements:
+> No changes detected between paths <.../test_diff/user1//test/sub_test> and <^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk//test/sub_test@2>.:
  '============================================================================
 

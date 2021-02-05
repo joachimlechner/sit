@@ -21,12 +21,12 @@ A         project
 A         project/sub_project
 A         project/sub_project/sub_sub_project
 A         project/sub_project/sub_sub_project/sub_sub_sub_project
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
 Adding         project
 Adding         project/sub_project
 Adding         project/sub_project/sub_sub_project
@@ -61,11 +61,11 @@ Checked out revision 1.
  |============================================================================
 > Adding ...
 A         test
+A         test/test_file2
 A         test/sub_test
-A         test/sub_test/test_file3
+A         test/sub_test/sub_test_file1
 A         test/sub_test2
 A         test/test_file1
-A         test/test_file2
 A         test_file4
  '============================================================================
 
@@ -77,7 +77,7 @@ A         test_file4
 > Changed:
    A         test
    A         test/sub_test
-   A         test/sub_test/test_file3
+   A         test/sub_test/sub_test_file1
    A         test/sub_test2
    A         test/test_file1
    A         test/test_file2
@@ -93,7 +93,7 @@ A         test_file4
  |============================================================================
 Adding         test
 Adding         test/sub_test
-Adding         test/sub_test/test_file3
+Adding         test/sub_test/sub_test_file1
 Adding         test/sub_test2
 Adding         test/test_file1
 Adding         test/test_file2
@@ -109,27 +109,67 @@ At revision 2.
 
 
  .============================================================================
- | Executing:  svn update
+ | Executing:  python .../../sit.py update
  |============================================================================
+> Updating ...
 Updating '.':
 At revision 2.
  '============================================================================
 
 
  .============================================================================
- | Executing:  svn rm test_file1
+ | Executing:  python .../../sit.py branch test -a
  |============================================================================
-D         test_file1
+Committing transaction...
+Committed revision 3.
+> Copying ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@2 to ^/project/sub_project/sub_sub_project/sub_sub_sub_project/branches/<user>.test ...
  '============================================================================
 
 
  .============================================================================
- |             show status
+ | Executing:  python .../../sit.py checkout test
+ |============================================================================
+> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/branches/<user>.test@HEAD ...
+At revision 3.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py branch
+ |============================================================================
+trunk:
+   trunk
+branches:
+ * <user>.test
+tags:
+releases:
+stashes:
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py add test_file5
+ |============================================================================
+> Adding ...
+A         test_file5
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py add sub_test2_file1
+ |============================================================================
+> Adding ...
+A         sub_test2_file1
+ '============================================================================
+
+
+ .============================================================================
  | Executing:  python .../../sit.py status
  |============================================================================
 > Changed:
-   D         ../../test/test_file1
-   M         ../../test/test_file2
+   A         ../../test/sub_test2/sub_test2_file1
+   M         ../../test_file4
+   A         ../../test_file5
 
 > Untracked:
   ?          ../../scripts
@@ -137,49 +177,104 @@ D         test_file1
 
 
  .============================================================================
- |             show status
- | Executing:  python .../../sit.py status .
+ | Executing:  python .../../sit.py commit -m 'test2'
  |============================================================================
+Adding         test/sub_test2/sub_test2_file1
+Sending        test_file4
+Adding         test_file5
+Transmitting file data ...done
+Committing transaction...
+Committed revision 4.
+> Committing data in ../.. ...
+> Updating ...
+Updating '.../test_diff/user1':
+At revision 4.
  '============================================================================
 
 
  .============================================================================
- | Executing:  pwd
+ | Executing:  python .../../sit.py checkout trunk
  |============================================================================
-.../test_diff/user1/test/sub_test
+> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@HEAD ...
+D    .../test_diff/user1/test_file5
+D    sub_test2_file1
+U    .../test_diff/user1/test_file4
+Updated to revision 4.
  '============================================================================
 
 
  .============================================================================
- | Executing:  python .../../sit.py diff -t diff
+ | Executing:  python .../../sit.py add sub_test2_file2
  |============================================================================
-> Detecting folders ...
-> Detected 3 folders in from:
-> Detected 3 folders in to:
-> Finding differences ...
-> Detected 1 changed elements in from:
-> Detected 2 changed elements in to:
-> Detected 0 not mached elements:
-> Showing differences ...
-Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test: test_file1
-diff -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
-1c1
-< test_data2
----
-> test_data2a
+> Adding ...
+A         sub_test2_file2
  '============================================================================
 
 
  .============================================================================
- | Executing:  python .../../sit.py diff -t diff .
+ | Executing:  python .../../sit.py commit -m 'test3'
  |============================================================================
-> Detecting folders ...
-> Detected 0 folders in from:
-> Detected 0 folders in to:
-> Finding differences ...
-> Detected 0 changed elements in from:
-> Detected 0 changed elements in to:
-> Detected 0 not mached elements:
-> No changes detected between paths <.../test_diff/user1//test/sub_test> and <^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk//test/sub_test@2>.:
+Adding         test/sub_test2/sub_test2_file2
+Transmitting file data .done
+Committing transaction...
+Committed revision 5.
+> Committing data in ../.. ...
+> Updating ...
+Updating '.../test_diff/user1':
+At revision 5.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py status
+ |============================================================================
+> Changed:
+   M         ../../test/sub_test2/sub_test2_file2
+
+> Untracked:
+  ?          ../../scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py merge test
+ |============================================================================
+> Changed not committed files detected::
+   M         .../test_diff/user1/test/sub_test2/sub_test2_file2
+ERROR: Error detected:
+ SitExceptionAbort: Aborting operation. There are uncommitted changes in sandbox.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py merge test -f
+ |============================================================================
+> Changed not committed files detected::
+   M         .../test_diff/user1/test/sub_test2/sub_test2_file2
+> Updating ...
+Updating '.../test_diff/user1':
+At revision 5.
+> Merging from ^/project/sub_project/sub_sub_project/sub_sub_sub_project/branches/<user>.test ...
+--- Merging r3 through r5 into '.../test_diff/user1':
+A    sub_test2_file1
+U    .../test_diff/user1/test_file4
+A    .../test_diff/user1/test_file5
+--- Recording mergeinfo for merge of r3 through r5 into '.../test_diff/user1':
+ U   .../test_diff/user1
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py status
+ |============================================================================
+> Changed:
+    M        ../..
+   A  +      ../../test/sub_test2/sub_test2_file1
+   M         ../../test/sub_test2/sub_test2_file2
+   M         ../../test_file4
+   A  +      ../../test_file5
+
+> Untracked:
+  ?          ../../scripts
  '============================================================================
 

@@ -1,0 +1,208 @@
+
+################################################
+# setup: Setup stash
+.../test_stash
+
+################################################
+# setup: create local repository (file system repository) server1
+.../test_stash/server1
+
+################################################
+# setup: create local / sandbox repository
+.../test_stash/server1_create
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_stash/server1/repo .
+ |============================================================================
+Checked out revision 0.
+ '============================================================================
+
+A         project
+A         project/sub_project
+A         project/sub_project/sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
+Adding         project
+Adding         project/sub_project
+Adding         project/sub_project/sub_sub_project
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+Transmitting file data .done
+Committing transaction...
+Committed revision 1.
+
+################################################
+# setup: 
+
+################################################
+# setup: create local / sandbox repository for user1
+.../test_stash/user1
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_stash/server1/repo/project/sub_project//sub_sub_project/sub_sub_sub_project//trunk .
+ |============================================================================
+A    .svnignore
+Checked out revision 1.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py add test test_file4
+ |============================================================================
+> Adding ...
+A         test
+A         test/test_file2
+A         test/sub_test1
+A         test/sub_test1/sub_test1_file1
+A         test/sub_test2
+A         test/test_file1
+A         test_file4
+ '============================================================================
+
+
+ .============================================================================
+ |             show status
+ | Executing:  python3 .../../sit.py status
+ |============================================================================
+> Changed:
+   A         test
+   A         test/sub_test1
+   A         test/sub_test1/sub_test1_file1
+   A         test/sub_test2
+   A         test/test_file1
+   A         test/test_file2
+   A         test_file4
+
+> Untracked:
+  ?          scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py commit . -m 'test blabla'
+ |============================================================================
+Adding         test
+Adding         test/sub_test1
+Adding         test/sub_test1/sub_test1_file1
+Adding         test/sub_test2
+Adding         test/test_file1
+Adding         test/test_file2
+Adding         test_file4
+Transmitting file data ....done
+Committing transaction...
+Committed revision 2.
+> Committing data in . ...
+> Updating ...
+Updating '.':
+At revision 2.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py add sub_test1_file2
+ |============================================================================
+> Adding ...
+A         sub_test1_file2
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py rm sub_test1_file1
+ |============================================================================
+D         sub_test1_file1
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py remove ../test_file1
+ |============================================================================
+D         .../test_stash/user1/test/test_file1
+ '============================================================================
+
+.../test_stash/user1/test/sub_test1
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py stash push test_stash -a
+ |============================================================================
+Committing transaction...
+Committed revision 3.
+Deleting       test/sub_test1/sub_test1_file1
+Adding         test/sub_test1/sub_test1_file2
+Deleting       test/test_file1
+Transmitting file data .done
+Committing transaction...
+Committed revision 4.
+> Copying ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@2 to ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test_stash#trunk#trunk#<DATE_TIME> ...
+> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test_stash#trunk#trunk#<DATE_TIME>@HEAD ...
+At revision 3.
+> Committing data in ../.. ...
+> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@2 ...
+D    sub_test1_file2
+A    sub_test1_file1
+A    .../test_stash/user1/test/test_file1
+Updated to revision 2.
+> Created stash <test_stash>:
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py stash apply test_stash
+ |============================================================================
+Reverted '.../test_stash/user1'
+> Merging from ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test_stash#trunk#trunk#<DATE_TIME>/ ...
+--- Merging r4 into '.../test_stash/user1':
+A    sub_test1_file2
+D    sub_test1_file1
+D    .../test_stash/user1/test/test_file1
+--- Recording mergeinfo for merge of r4 into '.../test_stash/user1':
+ U   .../test_stash/user1
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  sit status
+ |============================================================================
+> Changed:
+   D         ../../test/sub_test1/sub_test1_file1
+   A  +      ../../test/sub_test1/sub_test1_file2
+   D         ../../test/test_file1
+
+> Untracked:
+  ?          ../../scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  svn status ../../
+ |============================================================================
+?       ../../scripts
+D       ../../test/sub_test1/sub_test1_file1
+A  +    ../../test/sub_test1/sub_test1_file2
+D       ../../test/test_file1
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py stash list
+ |============================================================================
+[0] <TIME> <DATE> test_stash trunk/trunk ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test_stash#trunk#trunk#<DATE_TIME>/
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py stash drop test_stash -a
+ |============================================================================
+Committing transaction...
+Committed revision 5.
+ '============================================================================
+
