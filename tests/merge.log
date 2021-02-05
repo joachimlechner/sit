@@ -1,0 +1,280 @@
+
+################################################
+# setup: Setup diff
+.../test_diff
+
+################################################
+# setup: create local repository (file system repository) server1
+.../test_diff/server1
+
+################################################
+# setup: create local / sandbox repository
+.../test_diff/server1_create
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_diff/server1/repo .
+ |============================================================================
+Checked out revision 0.
+ '============================================================================
+
+A         project
+A         project/sub_project
+A         project/sub_project/sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+Adding         project
+Adding         project/sub_project
+Adding         project/sub_project/sub_sub_project
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+Transmitting file data .done
+Committing transaction...
+Committed revision 1.
+
+################################################
+# setup: 
+
+################################################
+# setup: create local / sandbox repository for user1
+.../test_diff/user1
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_diff/server1/repo/project/sub_project//sub_sub_project/sub_sub_sub_project//trunk .
+ |============================================================================
+A    .svnignore
+Checked out revision 1.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py add test test_file4
+ |============================================================================
+> Adding ...
+A         test
+A         test/sub_test
+A         test/sub_test/sub_test_file1
+A         test/sub_test2
+A         test/test_file1
+A         test/test_file2
+A         test_file4
+ '============================================================================
+
+
+ .============================================================================
+ |             show status
+ | Executing:  python .../../sit.py status
+ |============================================================================
+> Changed:
+   A         test
+   A         test/sub_test
+   A         test/sub_test/sub_test_file1
+   A         test/sub_test2
+   A         test/test_file1
+   A         test/test_file2
+   A         test_file4
+
+> Untracked:
+  ?          scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py commit . -m 'test blabla'
+ |============================================================================
+Adding         test
+Adding         test/sub_test
+Adding         test/sub_test/sub_test_file1
+Adding         test/sub_test2
+Adding         test/test_file1
+Adding         test/test_file2
+Adding         test_file4
+Transmitting file data ....done
+Committing transaction...
+Committed revision 2.
+> Committing data in . ...
+> Updating ...
+Updating '.':
+At revision 2.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py update
+ |============================================================================
+> Updating ...
+Updating '.':
+At revision 2.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py branch test -a
+ |============================================================================
+Committing transaction...
+Committed revision 3.
+> Copying ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@2 to ^/project/sub_project/sub_sub_project/sub_sub_sub_project/branches/<user>.test ...
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py checkout test
+ |============================================================================
+> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/branches/<user>.test@HEAD ...
+At revision 3.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py branch
+ |============================================================================
+trunk:
+   trunk
+branches:
+ * <user>.test
+tags:
+releases:
+stashes:
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py add test_file5
+ |============================================================================
+> Adding ...
+A         test_file5
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py add sub_test2_file1
+ |============================================================================
+> Adding ...
+A         sub_test2_file1
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py status
+ |============================================================================
+> Changed:
+   A         ../../test/sub_test2/sub_test2_file1
+   M         ../../test_file4
+   A         ../../test_file5
+
+> Untracked:
+  ?          ../../scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py commit -m 'test2'
+ |============================================================================
+Adding         test/sub_test2/sub_test2_file1
+Sending        test_file4
+Adding         test_file5
+Transmitting file data ...done
+Committing transaction...
+Committed revision 4.
+> Committing data in ../.. ...
+> Updating ...
+Updating '.../test_diff/user1':
+At revision 4.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py checkout trunk
+ |============================================================================
+> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@HEAD ...
+D    .../test_diff/user1/test_file5
+D    sub_test2_file1
+U    .../test_diff/user1/test_file4
+Updated to revision 4.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py add sub_test2_file2
+ |============================================================================
+> Adding ...
+A         sub_test2_file2
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py commit -m 'test3'
+ |============================================================================
+Adding         test/sub_test2/sub_test2_file2
+Transmitting file data .done
+Committing transaction...
+Committed revision 5.
+> Committing data in ../.. ...
+> Updating ...
+Updating '.../test_diff/user1':
+At revision 5.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py status
+ |============================================================================
+> Changed:
+   M         ../../test/sub_test2/sub_test2_file2
+
+> Untracked:
+  ?          ../../scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py merge test
+ |============================================================================
+> Changed not committed files detected::
+   M         .../test_diff/user1/test/sub_test2/sub_test2_file2
+ERROR: Error detected:
+ SitExceptionAbort: Aborting operation. There are uncommitted changes in sandbox.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py merge test -f
+ |============================================================================
+> Changed not committed files detected::
+   M         .../test_diff/user1/test/sub_test2/sub_test2_file2
+> Updating ...
+Updating '.../test_diff/user1':
+At revision 5.
+> Merging from ^/project/sub_project/sub_sub_project/sub_sub_sub_project/branches/<user>.test ...
+--- Merging r3 through r5 into '.../test_diff/user1':
+A    sub_test2_file1
+U    .../test_diff/user1/test_file4
+A    .../test_diff/user1/test_file5
+--- Recording mergeinfo for merge of r3 through r5 into '.../test_diff/user1':
+ U   .../test_diff/user1
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py status
+ |============================================================================
+> Changed:
+    M        ../..
+   A  +      ../../test/sub_test2/sub_test2_file1
+   M         ../../test/sub_test2/sub_test2_file2
+   M         ../../test_file4
+   A  +      ../../test_file5
+
+> Untracked:
+  ?          ../../scripts
+ '============================================================================
+

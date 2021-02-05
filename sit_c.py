@@ -317,7 +317,7 @@ class sit_c:
             # list branches
             for i_branch_type in self.branch_types:
                 print(i_branch_type + ':')
-                if i_branch_type == "trunk": # FIXXME: support differen trunk names
+                if i_branch_type == "trunk": # FIXME: support differen trunk names
                     command = 'svn ls ' + self.project_path + '| grep trunk/'
                 else:
                     command = 'svn ls ' + self.project_path + '/' + i_branch_type
@@ -361,7 +361,6 @@ class sit_c:
             else: # use svn edit command if none given
                 branch_message = None
 
-            # FIXXXME: auto message not working ?
             self.do_branch(branch, branch_to, branch_message, parameters['verbose'])
 
     ###############################################################
@@ -372,10 +371,6 @@ class sit_c:
             if self.repository_revision == self.sandbox_revision:
                 if message is "auto_message":
                     message = self.auto_message_prefix + "creating branch " + branch + " (" + branch_to_url + ") from " + self.relative_branch_root_url + "@" + self.repository_revision
-                #if auto_message:
-                #    message = auto_message_message
-                #else:
-                #    message = None
                 self.do_copy(self.relative_branch_root_url, self.repository_revision, branch_to_url, message, verbose)
                 return self.repository_revision
             else:
@@ -1149,7 +1144,7 @@ class sit_c:
                 self.do_commit(commit_path, commit_message, parameters['verbose'])
                 self.do_checkout(branch_url, branch_revision, parameters['verbose'])
             except SitException as e:
-                # FIXXME: implement cleanup, show history ?! show commands that were executed until this point ?!
+                # FIXME: implement cleanup, show history ?! show commands that were executed until this point ?!
                 raise SitException("Detected exception\n" + str(e))
             else:
                 self.tools.status("Created stash <" + name_selected + ">")
