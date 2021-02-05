@@ -22,6 +22,14 @@ class tools_c:
         print("INFO: " + message)
 
     ###############################################################
+    def process(self, message):
+        print("> " + message + " ...")
+
+    ###############################################################
+    def status(self, message):
+        print("> " + message + ":")
+
+    ###############################################################
     def error(self, message):
         print("ERROR: " + message)
 
@@ -35,38 +43,46 @@ class tools_c:
 
     ###############################################################
     def run_external_command(self, command, verbose=False):
-        return self.do_run_external_command(command, verbose, False, True)
+        return self.do_run_external_command(command, verbose, False, True, True)
+
+    def run_external_command_no_print(self, command, verbose=False):
+        return self.do_run_external_command(command, verbose, False, False, False)
 
     def run_external_command_ignore_status_and_print(self, command, verbose=False):
-        return self.do_run_external_command(command, verbose, True, True)
+        return self.do_run_external_command(command, verbose, True, True, True)
         
-    def do_run_external_command(self, command, verbose=False, ignore_status=False, print_line=False):
+    def do_run_external_command(self, command, verbose=False, ignore_exit_code=False, print_line=False, get_results=False):
         if verbose:
             self.info("Executing command: <" + command + ">")
         try:
-            sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            results = []
-            for line_item in sp.stdout: #.readlines():
-                #line = line_item.decode("utf-8").rstrip() # orginally this was used - failed with pathnames ?!
-                #line = line_item.rstrip()
-                #line = line_item.decode("utf-16").rstrip()
-                # FIXME: what to use here ?!
-                line = line_item.decode("ISO-8859-1").rstrip()
-                results.append(line)
-                if print_line is True:
-                    print(line)
-            return_value = sp.wait()
+            if get_results is False:
+                sp = subprocess.Popen(command, shell=True)
+                exit_code = sp.wait()
+
+            else:
+                sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                results = []
+                for line_item in sp.stdout: #.readlines():
+                    #line = line_item.decode("utf-8").rstrip() # orginally this was used - failed with pathnames ?!
+                    #line = line_item.rstrip()
+                    #line = line_item.decode("utf-16").rstrip()
+                    # FIXME: what to use here ?!
+                    line = line_item.decode("ISO-8859-1").rstrip()
+                    results.append(line)
+                    if print_line is True:
+                        print(line)
+                exit_code = sp.wait()
         except subprocess.CalledProcessError as e:
             raise ToolException(e.output)
         except KeyboardInterrupt:
             raise ToolException("User abort.")
 
-        if ignore_status is False:
-            if return_value != 0:
+        if ignore_exit_code is False:
+            if exit_code != 0:
                 #print("\n<\n")
                 raise ToolException("Command <" + command + "> failed with message: \n\n" + '\n'.join(results) + "\n")
         
-        return return_value
+        return exit_code
 
 
     ###############################################################
@@ -83,13 +99,13 @@ class tools_c:
                 # FIXME: what to use here ?!
                 line = line_item.decode("ISO-8859-1").rstrip()
                 results.append(line)
-            return_value = sp.wait()
+            exit_code = sp.wait()
         except subprocess.CalledProcessError as e:
             raise ToolException(e.output)
         except KeyboardInterrupt:
             raise ToolException("User abort.")
         
-        if return_value != 0:
+        if exit_code != 0:
             raise ToolException("Command <" + command + "> failed")
         
         return results

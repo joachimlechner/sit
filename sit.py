@@ -30,6 +30,9 @@ def cmd_commit(**parameters):
 def cmd_add(**parameters):
     the_sit.sit_add(parameters)
 
+def cmd_remove(**parameters):
+    the_sit.sit_remove(parameters)
+
 def cmd_branch(**parameters):
     the_sit.sit_branch(parameters)
 
@@ -70,7 +73,7 @@ if __name__ == '__main__':
     if the_sit.is_svn_path():
         
         ########################
-        parser_sit_merge = subparsers.add_parser('merge', help="Merge given branch to local branch") #, aliases=['st'])
+        parser_sit_merge = subparsers.add_parser('merge', help="Merge given branch to local branch")
         parser_sit_merge.add_argument('branch', nargs=1, help='The target branch, if missing all branches are considered')
         parser_sit_merge.add_argument('-t', dest="branch_type", nargs=1, default=[None], help='The branch type to use for merging from')
         parser_sit_merge.add_argument('-f', dest="ignore_modified_sandbox", action='store_const', help='Force merging even if local modified folders/files exist', const=True, default=False)
@@ -78,7 +81,7 @@ if __name__ == '__main__':
         parser_sit_merge.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
         
         ########################
-        parser_sit_branch = subparsers.add_parser('branch', help="Show branches or create a branch from the current branch") #, aliases=['st'])
+        parser_sit_branch = subparsers.add_parser('branch', help="Show branches or create a branch from the current branch")
         parser_sit_branch.add_argument('branch', nargs='?', help='The target branch, if missing all branches are considered')
         parser_sit_branch.add_argument('-d', dest="avoid_user_name_prefix_to_branch", action='store_const', help='Do not append username to branch name when creating', const=True, default=False)
         parser_sit_branch.add_argument('-f', dest="ignore_modified_sandbox", action='store_const', help='Force creating of branch even if local modified folders/files exist', const=True, default=False)
@@ -89,20 +92,28 @@ if __name__ == '__main__':
         parser_sit_branch.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
 
         ########################
-        parser_sit_add = subparsers.add_parser('add', help="add files/folders to version control") #, aliases=['st'])
+        parser_sit_add = subparsers.add_parser('add', help="add files/folders to version control")
         parser_sit_add.add_argument('options', nargs='*', help='File(s)/Folder(s) to add', default="")
         parser_sit_add.add_argument('-v', dest="verbose", action='store_const', help='Verbose what is done', const=True, default=False)
         parser_sit_add.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
+
+        ########################
+        parser_sit_remove = {}
+        for subcmd in ["remove", "rm"]:
+            parser_sit_remove[subcmd] = subparsers.add_parser(subcmd, help="remove files/folders to version control")
+            parser_sit_remove[subcmd].add_argument('options', nargs='*', help='File(s)/Folder(s) to remove', default="")
+            parser_sit_remove[subcmd].add_argument('-v', dest="verbose", action='store_const', help='Verbose what is done', const=True, default=False)
+            parser_sit_remove[subcmd].add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
  
         ########################
-        parser_sit_commit = subparsers.add_parser('commit', help='commit changes of the top relative to the local path, or for the given path') #, aliases=['st'])
+        parser_sit_commit = subparsers.add_parser('commit', help='commit changes of the top relative to the local path, or for the given path')
         parser_sit_commit.add_argument('path', nargs='?', help='The path to commit', default=the_sit.get_relative_path_to_root())
         parser_sit_commit.add_argument('-m', dest="message", nargs=1, help='The message to use for commit', default="")
         parser_sit_commit.add_argument('-v', dest="verbose", action='store_const', help='Verbose what is done', const=True, default=False)
         parser_sit_commit.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
 
         ########################
-        parser_sit_reset = subparsers.add_parser('reset', help='reset changes to head of the top relative to the local path, or for the given path') #, aliases=['st'])
+        parser_sit_reset = subparsers.add_parser('reset', help='reset changes to head of the top relative to the local path, or for the given path')
         parser_sit_reset.add_argument('path', nargs='?', help='The path to commit', default=the_sit.get_relative_path_to_root())
         parser_sit_reset.add_argument('-v', dest="verbose", action='store_const', help='Verbose what is done', const=True, default=False)
         parser_sit_reset.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
@@ -151,16 +162,15 @@ if __name__ == '__main__':
         subparsers_sit_stash = parser_sit_stash.add_subparsers(dest='subsubparser')
 
         ############
-        parser_sit_stash_push = subparsers_sit_stash.add_parser('push', help="Push modifications to stash") #, aliases=['st'])
+        parser_sit_stash_push = subparsers_sit_stash.add_parser('push', help="Push modifications to stash")
         parser_sit_stash_push.add_argument('-v', dest="verbose", action='store_const', help='Verbose what is done', const=True, default=False)
         parser_sit_stash_push.add_argument('-a', dest="auto_message", action='store_const', help='Use automatic generated log message for operation', const=True, default=False)
         parser_sit_stash_push.add_argument('name', nargs='?', default=None)
         parser_sit_stash_push.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
         
-
-        parser_sit_stash_drop = subparsers_sit_stash.add_parser('drop', help="Drop selected stash") #, aliases=['st'])
+        parser_sit_stash_drop = subparsers_sit_stash.add_parser('drop', help="Drop selected stash")
         parser_sit_stash_drop.add_argument('-v', dest="verbose", action='store_const', help='Verbose what is done', const=True, default=False)
-        parser_sit_stash_drop.add_argument('-a', dest="auto_message", action='store_const', help='Use automatic generated log message for remove operation', const=True, default=False)
+        parser_sit_stash_drop.add_argument('-a', dest="auto_message", action='store_const', help='Use automatic generated log message for operation', const=True, default=False)
         parser_sit_stash_drop.add_argument('name', nargs='?', default=None)
         parser_sit_stash_drop.add_argument('-u', dest="username", nargs=1, default=[ os.environ['USER'] ], help='The username to use')
         parser_sit_stash_drop.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
@@ -190,6 +200,8 @@ if __name__ == '__main__':
     kwargs = vars(parser.parse_args())
     if 'subparser' in kwargs:
         subparser_name = kwargs.pop('subparser')
+        if subparser_name == "rm":
+            subparser_name = "remove"
     else:
         subparser_name = None
 

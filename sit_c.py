@@ -40,9 +40,9 @@ class sit_c:
     project_path = "" 
     branch_type = "" 
     branch_name = ""
-    branch_types = ['trunk', 'branches', 'tags', 'releases']
+    branch_types = ['trunk', 'branches', 'tags', 'releases', 'stashes']
     default_branch_type = 'branches'
-    trunk_names = ['trunk', 'master']
+    trunk_names = ['trunk', 'master', 'main']
     default_trunk_name = 'trunk'
     default_trunk_type = 'trunk'
     sandbox_branch_id = 'sandbox_branch_id'
@@ -261,31 +261,53 @@ class sit_c:
     def sit_add(self, parameters):
         if(parameters['debug']):
             self.show()
-            
+
+        self.tools.process("Adding")
         self.tools.run_external_command("svn add " + ' '.join(parameters['options']), parameters['verbose'])
+
+    ###############################################################
+    def sit_remove(self, parameters):
+        if(parameters['debug']):
+            self.show()
+            
+        self.tools.run_external_command("svn remove " + ' '.join(parameters['options']), parameters['verbose'])
 
     ###############################################################
     def sit_commit(self, parameters):
         if(parameters['debug']):
             self.show()
-            
-        self.do_commit(parameters['path'], ' '.join(parameters['message']), parameters['verbose'])
+
+        try:
+            self.do_commit(parameters['path'], ' '.join(parameters['message']), parameters['verbose'])
+        except SitException as e:
+            raise SitExceptionAbort("Aborting due execution error.\n" + str(e))
+        else:
+            # auto update after commit to update history
+            self.do_update(parameters['verbose'])
         
     ###############################################################
     def do_commit(self, path, message, verbose):
+        self.tools.process("Committing data in " + path)
+        command = "svn commit " + path
         if message:
-            self.tools.run_external_command("svn commit " + path + " -m \'" + message + '\'', verbose)
-        else:
-            self.tools.run_external_command("svn commit " + path, verbose)
-
+            command = command + " -m \'" + message + '\''
+        try:
+            self.tools.run_external_command_no_print(command, verbose)
+        except ToolException as e:
+            raise SitExceptionAbort("Aborting due execution error.\n" + str(e))
         
     ###############################################################
     def sit_reset(self, parameters):
         if(parameters['debug']):
             self.show()
-            
-        self.tools.run_external_command("svn revert -R " + parameters['path'], parameters['verbose'])
 
+        self.do_reset(parameters['path'], parameters['verbose'])
+
+    ###############################################################
+    def do_reset(self, path, verbose):
+        self.tools.process("Resetting " + path)
+        self.tools.run_external_command("svn revert -R " + path, verbose)
+        
     ###############################################################
     def sit_branch(self, parameters):
         if(parameters['debug']):
@@ -295,7 +317,7 @@ class sit_c:
             # list branches
             for i_branch_type in self.branch_types:
                 print(i_branch_type + ':')
-                if i_branch_type == "trunk":
+                if i_branch_type == "trunk": # FIXXME: support differen trunk names
                     command = 'svn ls ' + self.project_path + '| grep trunk/'
                 else:
                     command = 'svn ls ' + self.project_path + '/' + i_branch_type
@@ -334,20 +356,27 @@ class sit_c:
 
             if parameters['message']:
                 branch_message = ' '.join(parameters['message'])
+            elif parameters['auto_message']:
+                branch_message = "auto_message"
             else: # use svn edit command if none given
                 branch_message = None
-                
-            self.do_branch(branch, branch_to, parameters['auto_message'], branch_message, parameters['verbose'])
+
+            # FIXXXME: auto message not working ?
+            self.do_branch(branch, branch_to, branch_message, parameters['verbose'])
 
     ###############################################################
-    def do_branch(self, branch, branch_to_url, auto_message, message, verbose):
+    def do_branch(self, branch, branch_to_url, message, verbose):
             if self.is_repository_url_existing(branch_to_url):
                 raise SitExceptionAbort("Aborting operation. There is already a branch with the same name existing <" + branch_to_url + ">.")
 
             if self.repository_revision == self.sandbox_revision:
-                if (message is None) and auto_message:
+                if message is "auto_message":
                     message = self.auto_message_prefix + "creating branch " + branch + " (" + branch_to_url + ") from " + self.relative_branch_root_url + "@" + self.repository_revision
-                self.svn_copy(self.relative_branch_root_url, self.repository_revision, branch_to_url, message, verbose)
+                #if auto_message:
+                #    message = auto_message_message
+                #else:
+                #    message = None
+                self.do_copy(self.relative_branch_root_url, self.repository_revision, branch_to_url, message, verbose)
                 return self.repository_revision
             else:
                 revisions = []
@@ -370,18 +399,23 @@ class sit_c:
                     # this happens when somewhere else a branch got committed ??? local commits without update should not end in this situation !
                     revision = self.sandbox_revision
 
-                if (message is None) and auto_message:
+                if message is "auto_message":
                     message = self.auto_message_prefix + "creating branch " + branch + " (" + branch_to_url + ") from " + self.relative_branch_root_url + "@" + revision
-                self.svn_copy(self.relative_branch_root_url, revision, branch_to_url, message, verbose)
+                self.do_copy(self.relative_branch_root_url, revision, branch_to_url, message, verbose)
                 return revision
-            
+
     ###############################################################
-    def svn_copy(self, branch_from_url, branch_from_revision, branch_to_url, message, verbose):
+    def do_copy(self, branch_from_url, branch_from_revision, branch_to_url, message, verbose):
+        self.tools.process("Copying " + branch_from_url + "@" + branch_from_revision + " to " + branch_to_url)
+        command = 'svn copy -r ' + branch_from_revision + ' ' + branch_from_url + ' ' + branch_to_url
         if message:
-            command = 'svn copy -r ' + branch_from_revision + ' ' + branch_from_url + ' ' + branch_to_url + " -m \'" + message + "\'"
-        else:
-            command = 'svn copy -r ' + branch_from_revision + ' ' + branch_from_url + ' ' + branch_to_url
-        self.tools.run_external_command(command, verbose)
+                command = command + " -m \'" + message + "\'"
+        try:
+            self.tools.run_external_command_no_print(command, verbose)
+            if not self.is_repository_url_existing(branch_to_url):
+                raise SitExceptionAbort("Failed to copy " + branch_from_url + "@" + branch_from_revision + " to " + branch_to_url)
+        except ToolException as e:
+            raise SitExceptionAbort("svn copy failed\n" + str(e))
         
     ###############################################################
     def select_branch_by_name(self, branch, branch_type, verbose):
@@ -452,6 +486,7 @@ class sit_c:
         
     ###############################################################
     def do_checkout(self, branch_url, revision, verbose):
+        self.tools.process("Checking out " + branch_url + "@" + revision)
         self.tools.run_external_command('svn switch ' + branch_url + '@' + revision + ' ' + self.get_relative_path_to_root(), verbose)
 
     ###############################################################
@@ -778,6 +813,8 @@ class sit_c:
                 db['to.folders'] = []
                 db['not_matched'] = []
 
+                self.tools.process("Detecting folders")
+                    
                 p = re.compile('^\^')
                 m = p.match(paths['path1'])
                 if m:
@@ -787,6 +824,8 @@ class sit_c:
                 for res in self.tools.run_external_command_and_get_results(command, parameters['verbose']):
                     db['from.folders'].append(res)
 
+                self.tools.status("Detected " + str(len(db['from.folders'])) + " folders in from")
+                    
                 m = p.match(paths['path2'])
                 if m:
                     command = "svn ls --depth=infinity " + paths['path2'] + " | grep /$ | sed 's,/$,,g'"
@@ -794,17 +833,22 @@ class sit_c:
                     command = "find " + paths['path2'] + " -type d | grep -v \.svn | grep -v ^\.$ | sed 's," + paths['path2'] + ",,g' | grep -v '^$'"
                 for res in self.tools.run_external_command_and_get_results(command, parameters['verbose']):
                     db['to.folders'].append(res)
-                    
+
+                self.tools.status("Detected " + str(len(db['to.folders'])) + " folders in to")
+                                                      
                 # if local file - it might not be up to date => so we need to grap it via find as follows:
                 # find -type d | grep -v \.svn | grep -v ^\.$
                 
                 # if from repo
                 # svn ls --depth=infinity ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk | grep /$
                 
+
+
+                self.tools.process("Finding differences")
                 
                 for res in self.tools.run_external_command_and_get_results('svn diff --ignore-properties --summarize ' + paths['path1'] + ' ' + paths['path2'], parameters['verbose']):
                     if(parameters['debug']):
-                        print("SVN_DIFF: " + res + "\n")
+                        print("DIFF: " + res + "\n")
                     p_modified = re.compile('^M(.*)\s+(' + repository_from_path + '|' + repository_to_path + ')/(\S+)$')
                     p_added    = re.compile('^A(.*)\s+(' + repository_from_path + '|' + repository_to_path + ')/(\S+)$')
                     p_deleted  = re.compile('^D(.*)\s+(' + repository_from_path + '|' + repository_to_path + ')/(\S+)$')
@@ -821,6 +865,10 @@ class sit_c:
                     else:
                         db['not_matched'].append(res)
 
+                self.tools.status("Detected " + str(len(db['from.changed'])) + " changed elements in from")
+                self.tools.status("Detected " + str(len(db['to.changed'])) + " changed elements in to")
+                self.tools.status("Detected " + str(len(db['not_matched'])) + " not mached elements")
+                                  
                 if(parameters['debug']):
                     # print "\nModified:\n" + '\n'.join(modified)
                     # print "\nAdded:\n" + '\n'.join(added)
@@ -837,8 +885,10 @@ class sit_c:
                     print("to path: " + repository_to_path)
 
                 if (len(db['from.changed']) == 0) and (len(db['to.changed']) == 0):
-                    print("No changes detected between paths <" + repository_from_path + "> and <" + repository_to_path + ">.")
+                    self.tools.status("No changes detected between paths <" + repository_from_path + "> and <" + repository_to_path + ">.")
                 else:
+
+                    self.tools.process("Showing differences")
                     
                     datetime = time.strftime("%Y.%m.%d.%H_%M_%S")
 
@@ -913,11 +963,28 @@ class sit_c:
             if not self.is_repository_url_existing(os.path.abspath(os.getcwd() + '/' + parameters['path']), parameters['verbose']):
                 raise SitExceptionParseError("The given path <" + parameters['path'] + "> is not an svn path")
 
-        command = 'svn status ' + parameters['path'] + ' 2>/dev/null'
-        lines = self.tools.run_external_command_and_get_results(command, parameters['verbose'])
-        
-        untracked = {}
-        changed = {}
+        db = self.get_status(parameters['path'], parameters['verbose'])
+    
+        if len(db['changed']):
+            self.tools.status("Changed")
+            for i in sorted (db['changed'].keys()):
+                print("  %-10s %s" % (db['changed'][i], i))
+    
+        if len(db['untracked']):
+            if len(db['untracked']):
+                print("")
+            self.tools.status("Untracked")
+            for i in sorted (db['untracked'].keys()):
+                print("  %-10s %s" % (db['untracked'][i], i))
+
+    ###############################################################
+    def get_status(self, path, verbose):
+        command = 'svn status ' + path + ' 2>/dev/null'
+        lines = self.tools.run_external_command_and_get_results(command, verbose)
+
+        db = {}
+        db['changed'] = {}
+        db['untracked'] = {}
     
         for line in lines:
 
@@ -948,26 +1015,20 @@ class sit_c:
             p = re.compile(r'^(\?)\s+(.+)$')
             m = p.match(line)
             if m:
-                untracked[str(m.group(2))] = str(m.group(1))
+                db['untracked'][str(m.group(2))] = str(m.group(1))
     
-            p = re.compile(r'^([^\?])\s+(.+)$')
+            # p = re.compile(r'^([^\?])\s+(.+)$')
+            # m = p.match(line)
+            # if m:
+            #     db['changed'][str(m.group(2))] = str(m.group(1))
+
+            p = re.compile(r'^(([^\?]| )([^\?]| )([^\?]| )([^\?]| )([^\?]| )([^\?]| )([^\?]| ))\s+(.+)$')
             m = p.match(line)
             if m:
-                changed[str(m.group(2))] = str(m.group(1))
-    
-        if len(changed):
-            print("Changed")
-            for i in sorted (changed.keys()):
-                print("  %-10s %s" % (changed[i], i))
-    
-        if len(untracked):
-            if len(changed):
-                print("")
-            print("Untracked")
-            for i in sorted (untracked.keys()):
-                print("  %-10s %s" % (untracked[i], i))
+                db['changed'][str(m.group(9))] = " " + str(m.group(1))
 
-
+        return db
+        
     ###############################################################
     def sit_update(self, parameters):
         if(parameters['debug']):
@@ -979,32 +1040,41 @@ class sit_c:
             if not parameters['ignore_modified_sandbox']:
                 if self.is_sandbox_modified(parameters['verbose']):
                     raise SitExceptionAbort("Aborting operation. There are uncommitted changes in sandbox.")
-                  
-            self.tools.run_external_command('svn update ' + self.get_relative_path_to_root(), parameters['verbose']) # self.sandbox_root_path)
+            self.do_update(parameters['verbose'])  
         else:
             raise SitExceptionAbort("Aborting operation. Path/file not within sandbox. <" + parameters['path'] + ">")
 
     ###############################################################
+    def do_update(self, verbose):
+        self.tools.process("Updating")
+        self.tools.run_external_command('svn update ' + self.get_relative_path_to_root(), verbose) # self.sandbox_root_path)
+        
+    ###############################################################
     def sit_merge(self, parameters):
         if(parameters['debug']):
             self.show()
-            
+
+        if self.is_sandbox_modified(parameters['verbose']):
+            db = self.get_status(self.sandbox_root_path, parameters['verbose'])
+            self.tools.status("Changed not committed files detected:")
+            for i in sorted (db['changed'].keys()):
+                print("  %-10s %s" % (db['changed'][i], i))
+                
         if not parameters['ignore_modified_sandbox']:
             if self.is_sandbox_modified(parameters['verbose']):
                 raise SitExceptionAbort("Aborting operation. There are uncommitted changes in sandbox.")
-        
+                
         branch_repository_url, branch_selected = self.select_branch_by_name(parameters['branch'][0], parameters['branch_type'][0], parameters['verbose'])
 
-        # FIXXME: make revision selectable ???
-        
-        self.tools.run_external_command('svn merge ' + branch_repository_url, parameters['verbose'])
+
+        self.do_update(parameters['verbose'])
+            
+        self.do_merge(branch_repository_url, "", parameters['verbose'])
 
     ###############################################################
-    def do_merge(self, path, message, verbose=False):
-        if message:
-            command = "svn merge " + path + " -m \'" + message + "\'"
-        else:
-            command = "svn merge " + path
+    def do_merge(self, path, revision, message, verbose=False):
+        self.tools.process("Merging from " + path)
+        command = "svn merge " + path + ' ' + revision + ' ' + self.get_relative_path_to_root()
         self.tools.run_external_command(command, verbose)
         
     ###############################################################
@@ -1065,11 +1135,15 @@ class sit_c:
             # FIXME: add message ?
             commit_path = self.get_relative_path_to_root()
             branch_url = self.relative_branch_root_url
-            branch_message = "Stash Push (create branch): from <" + branch_url + '> to <'  + stash_branch_url + '> using stash reference name <' + name_selected + '>'
-            # FIXME: revision in name !?
 
+            if parameters['auto_message']:
+                # FIXME: revision in name !?
+                branch_message = "Stash Push (create branch): from <" + branch_url + '> to <'  + stash_branch_url + '> using stash reference name <' + name_selected + '>'
+            else: # use svn edit command if none given
+                branch_message = None
+                
             try:
-                branch_revision = self.do_branch("branch_name", stash_branch_url, parameters['auto_message'], branch_message, parameters['verbose'])
+                branch_revision = self.do_branch("branch_name", stash_branch_url, branch_message, parameters['verbose'])
                 self.do_checkout(stash_branch_url, 'HEAD', parameters['verbose'])
                 commit_message = "Stash Push (commit all modifications): from <" + branch_url + "@" + branch_revision + '> to <'  + stash_branch_url + '> using stash reference name <' + name_selected + '>' 
                 self.do_commit(commit_path, commit_message, parameters['verbose'])
@@ -1078,7 +1152,7 @@ class sit_c:
                 # FIXXME: implement cleanup, show history ?! show commands that were executed until this point ?!
                 raise SitException("Detected exception\n" + str(e))
             else:
-                self.tools.info("Created stash <" + name_selected + ">")
+                self.tools.status("Created stash <" + name_selected + ">")
             #try:
             #    sit_branch()
             #    sit_checkout()
@@ -1219,7 +1293,7 @@ class sit_c:
     ###############################################################
     def do_remove_branch_stash(self, identifier, path, auto_message, verbose=False):
         if auto_message:
-            remove_message = auto_message_prefix + "removing stash " + str(identifier) + " which is: " + path
+            remove_message = self.auto_message_prefix + "removing stash " + str(identifier) + " which is: " + path
         else:
             remove_message = None
         self.do_remove_branch(path, remove_message, verbose)
@@ -1251,7 +1325,7 @@ class sit_c:
                 if stashes[identifier]:
                     data = stashes[identifier]
                     stash_url = data['stash_url']
-                    self.do_merge_stash(stash_url, parameters['auto_message'], parameters['verbose'])
+                    self.do_merge_stash(stash_url, parameters['verbose'])
                 else:
                     raise SitExceptionAbort("Aborting operation. There is no stash to apply available with the identifier: <" + parameters['name'] + ">")
             else:
@@ -1263,7 +1337,7 @@ class sit_c:
                     if stash_url is None: # do only if not found already
                         if parameters['name'] == stash_name: # if name matches
                             stash_url = data['stash_url']
-                            self.do_merge_stash(stash_url, parameters['auto_message'], parameters['verbose'])
+                            self.do_merge_stash(stash_url, parameters['verbose'])
                 if stash_url is None: # if none is found error out
                     raise SitExceptionAbort("Aborting operation. There is no stash to apply found with the name: <" + parameters['name'] + ">")
         else:
@@ -1271,19 +1345,22 @@ class sit_c:
             if stashes[identifier]:
                 data = stashes[identifier]
                 stash_url = data['stash_url']
-                self.do_merge_stash(stash_url, parameters['auto_message'], parameters['verbose'])
+                self.do_merge_stash(stash_url, parameters['verbose'])
             else:
                 raise SitExceptionAbort("Aborting operation. There is no stash to apply available")
 
     ###############################################################
-    def do_merge_stash(self, stash_url, auto_message, verbose):
+    def do_merge_stash(self, stash_url, verbose):
         revision = self.do_get_head_revsion(stash_url, verbose)
-        path = stash_url + " -r " + str(int(revision)-1) + ":" + revision + " " + self.relative_path 
-        if auto_message:
-            merge_message = self.auto_message_prefix + "applying stash " + identifier + " which is <" + stash_url + "> at path <" + path + ">"
+        revision_option = " -r " + str(int(revision)-1) + ":" + revision
+        try:
+            self.do_merge(stash_url, revision_option, verbose)
+        except SitException as e:
+            raise SitExceptionAbort("Merge failed\n" + str(e))
         else:
-            merge_message = None
-        self.do_merge(path, merge_message, verbose)
+            #self.tools.process("Auto remove merge info")
+            command = 'svn revert ' + self.get_relative_path_to_root()
+            self.tools.run_external_command_no_print(command, verbose)
 
     ###############################################################
     def do_get_head_revsion(self, path, verbose=False):

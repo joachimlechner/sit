@@ -32,7 +32,7 @@ execute "$SIT status"
 
 ######################
 execute "$SIT branch testbranch -m \"testbranch\""
-execute "$SIT branch testbranch2 -a"
+execute "$SIT branch testbranch2 -a" "ATTENTION: press ENTER to continue !!!"
 
 execute "$SIT checkout testbranch2"
 
@@ -43,7 +43,7 @@ execute "$SIT commit -m \"testbranch\""
 touch t3
 execute "$SIT update"
 execute "$SIT add t3"
-execute "$SIT stash push 'test'"
+execute "$SIT stash push 'test' -a"
 execute "$SIT status"
 
 execute "$SIT branch"
@@ -52,7 +52,7 @@ execute "$SIT stash list"
 
 touch t4
 execute "$SIT add t4"
-execute "$SIT stash push 'test2'"
+execute "$SIT stash push 'test2' -a" "ATTENTION: press ENTER to continue !!!"
 
 #execute "$SIT stash apply 'test'"
 execute "$SIT stash list"
@@ -67,3 +67,5 @@ execute "svn ls ^/stashes"
 execute "$SIT diff trunk -t diff"
 #
 #execute "$SIT branch"
+
+execute "$SIT branch"
