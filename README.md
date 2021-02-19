@@ -73,9 +73,10 @@ List all available stashes
 * forward some missing svn commands to be able to complete need to use the svn command
 
 ### Requirements
-Python 2.7 upwards
-Note that with python 3.x inquirer package is used for branch selection
-Subversion >= 1.7 (carret notation (^/trunk), single .svn folder in main repo (at least its not tested from my side))
+* Python 2.7 upwards
+* Note that with python 3.x inquirer package is used for branch selection
+* Subversion >= 1.7 (carret notation (^/trunk), single .svn folder in main repo (at least its not tested from my side))
+* Linux (at least more is not tested from my side, but you can check if it works by running the included test suite)
 
 ### Installation
 
