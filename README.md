@@ -6,7 +6,7 @@ Licence: GNU GENERAL PUBLIC LICENSE, Version 2, June 1991
 
 ## The idea
 Subversion (svn) misses some neat features that git supports, which were tried to port over with this project.
-The basic idea is to have a wrapper script arround svn for easy usage of svn.
+The basic idea is to have a wrapper script arround subversion for easy usage of subversion / usage of svn similar to git.
 
 ### Features
 Here some of the implemented features
