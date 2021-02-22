@@ -1,18 +1,18 @@
 
 ################################################
-# setup: Setup stash
-.../test_stash
+# setup: Setup diff
+.../test_merge2
 
 ################################################
 # setup: create local repository (file system repository) server1
-.../test_stash/server1
+.../test_merge2/server1
 
 ################################################
 # setup: create local / sandbox repository
-.../test_stash/server1_create
+.../test_merge2/server1_create
 
  .============================================================================
- | Executing:  svn checkout file://.../test_stash/server1/repo .
+ | Executing:  svn checkout file://.../test_merge2/server1/repo .
  |============================================================================
 Checked out revision 0.
  '============================================================================
@@ -21,12 +21,12 @@ A         project
 A         project/sub_project
 A         project/sub_project/sub_sub_project
 A         project/sub_project/sub_sub_project/sub_sub_sub_project
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
 Adding         project
 Adding         project/sub_project
 Adding         project/sub_project/sub_sub_project
@@ -46,10 +46,10 @@ Committed revision 1.
 
 ################################################
 # setup: create local / sandbox repository for user1
-.../test_stash/user1
+.../test_merge2/user1
 
  .============================================================================
- | Executing:  svn checkout file://.../test_stash/server1/repo/project/sub_project//sub_sub_project/sub_sub_sub_project//trunk .
+ | Executing:  svn checkout file://.../test_merge2/server1/repo/project/sub_project//sub_sub_project/sub_sub_sub_project//trunk .
  |============================================================================
 A    .svnignore
 Checked out revision 1.
@@ -61,8 +61,8 @@ Checked out revision 1.
  |============================================================================
 > Adding ...
 A         test
-A         test/sub_test1
-A         test/sub_test1/sub_test1_file1
+A         test/sub_test
+A         test/sub_test/sub_test_file1
 A         test/sub_test2
 A         test/test_file1
 A         test/test_file2
@@ -76,8 +76,8 @@ A         test_file4
  |============================================================================
 > Changed:
    A         test
-   A         test/sub_test1
-   A         test/sub_test1/sub_test1_file1
+   A         test/sub_test
+   A         test/sub_test/sub_test_file1
    A         test/sub_test2
    A         test/test_file1
    A         test/test_file2
@@ -93,8 +93,8 @@ A         test_file4
  |============================================================================
 > Committing data in . ...
 Adding         test
-Adding         test/sub_test1
-Adding         test/sub_test1/sub_test1_file1
+Adding         test/sub_test
+Adding         test/sub_test/sub_test_file1
 Adding         test/sub_test2
 Adding         test/test_file1
 Adding         test/test_file2
@@ -109,73 +109,67 @@ At revision 2.
 
 
  .============================================================================
- | Executing:  python3 .../../sit.py add sub_test1_file2
+ | Executing:  python3 .../../sit.py update
  |============================================================================
-> Adding ...
-A         sub_test1_file2
+> Updating ...
+Updating '.':
+At revision 2.
  '============================================================================
 
 
  .============================================================================
- | Executing:  python3 .../../sit.py rm sub_test1_file1
+ | Executing:  python3 .../../sit.py branch test -a
  |============================================================================
-D         sub_test1_file1
- '============================================================================
-
-
- .============================================================================
- | Executing:  python3 .../../sit.py remove ../test_file1
- |============================================================================
-D         .../test_stash/user1/test/test_file1
- '============================================================================
-
-.../test_stash/user1/test/sub_test1
-
- .============================================================================
- | Executing:  python3 .../../sit.py stash push test_stash -a
- |============================================================================
-> Copying ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@2 to ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test_stash#trunk#trunk#<DATE_TIME> ...
+> Copying ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@2 to ^/project/sub_project/sub_sub_project/sub_sub_sub_project/branches/<user>.test ...
 Committing transaction...
 Committed revision 3.
-> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test_stash#trunk#trunk#<DATE_TIME>@HEAD ...
-At revision 3.
-> Committing data in ../.. ...
-Deleting       test/sub_test1/sub_test1_file1
-Adding         test/sub_test1/sub_test1_file2
-Deleting       test/test_file1
-Transmitting file data .done
-Committing transaction...
-Committed revision 4.
-> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@2 ...
-D    sub_test1_file2
-A    sub_test1_file1
-A    .../test_stash/user1/test/test_file1
-Updated to revision 2.
-> Created stash <test_stash>:
  '============================================================================
 
 
  .============================================================================
- | Executing:  python3 .../../sit.py stash apply test_stash
+ | Executing:  python3 .../../sit.py checkout test
  |============================================================================
-> Merging from ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test_stash#trunk#trunk#<DATE_TIME>/ ...
---- Merging r4 into '.../test_stash/user1':
-A    sub_test1_file2
-D    sub_test1_file1
-D    .../test_stash/user1/test/test_file1
---- Recording mergeinfo for merge of r4 into '.../test_stash/user1':
- U   .../test_stash/user1
-Reverted '.../test_stash/user1'
+> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/branches/<user>.test@HEAD ...
+At revision 3.
  '============================================================================
 
 
  .============================================================================
- | Executing:  sit status
+ | Executing:  python3 .../../sit.py branch
+ |============================================================================
+trunk:
+   trunk
+branches:
+ * <user>.test
+tags:
+releases:
+stashes:
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py add test_file5
+ |============================================================================
+> Adding ...
+A         test_file5
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py add sub_test2_file1
+ |============================================================================
+> Adding ...
+A         sub_test2_file1
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py status
  |============================================================================
 > Changed:
-   D         ../../test/sub_test1/sub_test1_file1
-   A  +      ../../test/sub_test1/sub_test1_file2
-   D         ../../test/test_file1
+   A         ../../test/sub_test2/sub_test2_file1
+   M         ../../test_file4
+   A         ../../test_file5
 
 > Untracked:
   ?          ../../scripts
@@ -183,26 +177,113 @@ Reverted '.../test_stash/user1'
 
 
  .============================================================================
- | Executing:  svn status ../../
+ | Executing:  python3 .../../sit.py commit -m 'test2'
  |============================================================================
-?       ../../scripts
-D       ../../test/sub_test1/sub_test1_file1
-A  +    ../../test/sub_test1/sub_test1_file2
-D       ../../test/test_file1
+> Committing data in ../.. ...
+Adding         test/sub_test2/sub_test2_file1
+Sending        test_file4
+Adding         test_file5
+Transmitting file data ...done
+Committing transaction...
+Committed revision 4.
+> Updating ...
+Updating '.../test_merge2/user1':
+At revision 4.
  '============================================================================
 
 
  .============================================================================
- | Executing:  python3 .../../sit.py stash list
+ | Executing:  python3 .../../sit.py checkout trunk
  |============================================================================
-[0] <TIME> <DATE> test_stash trunk/trunk ^/project/sub_project/sub_sub_project/sub_sub_sub_project/stashes/<user>#test_stash#trunk#trunk#<DATE_TIME>/
+> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@HEAD ...
+D    .../test_merge2/user1/test_file5
+D    sub_test2_file1
+U    .../test_merge2/user1/test_file4
+Updated to revision 4.
  '============================================================================
 
 
  .============================================================================
- | Executing:  python3 .../../sit.py stash drop test_stash -a
+ | Executing:  python3 .../../sit.py add sub_test2_file2
  |============================================================================
+> Adding ...
+A         sub_test2_file2
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py commit -m 'test3'
+ |============================================================================
+> Committing data in ../.. ...
+Adding         test/sub_test2/sub_test2_file2
+Sending        test_file4
+Transmitting file data ..done
 Committing transaction...
 Committed revision 5.
+> Updating ...
+Updating '.../test_merge2/user1':
+At revision 5.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py status
+ |============================================================================
+> Changed:
+   M         ../../test/sub_test2/sub_test2_file2
+
+> Untracked:
+  ?          ../../scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py merge test
+ |============================================================================
+> Changed not committed files detected::
+   M         .../test_merge2/user1/test/sub_test2/sub_test2_file2
+ERROR: Error detected:
+ SitExceptionAbort: Aborting operation. There are uncommitted changes in sandbox.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py merge test -f
+ |============================================================================
+> Changed not committed files detected::
+   M         .../test_merge2/user1/test/sub_test2/sub_test2_file2
+> Updating ...
+Updating '.../test_merge2/user1':
+At revision 5.
+> Merging from ^/project/sub_project/sub_sub_project/sub_sub_sub_project/branches/<user>.test ...
+--- Merging r3 through r5 into '.../test_merge2/user1':
+A    sub_test2_file1
+C    .../test_merge2/user1/test_file4
+A    .../test_merge2/user1/test_file5
+--- Recording mergeinfo for merge of r3 through r5 into '.../test_merge2/user1':
+ U   .../test_merge2/user1
+Summary of conflicts:
+  Text conflicts: 1
+Summary of conflicts:
+  Text conflicts: 1
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py status
+ |============================================================================
+> Changed:
+    M        ../..
+   A  +      ../../test/sub_test2/sub_test2_file1
+   M         ../../test/sub_test2/sub_test2_file2
+   C         ../../test_file4
+   A  +      ../../test_file5
+   Summary   of conflicts:
+
+> Untracked:
+  ?          ../../scripts
+  ?          ../../test_file4.merge-left.r2
+  ?          ../../test_file4.merge-right.r5
+  ?          ../../test_file4.working
  '============================================================================
 

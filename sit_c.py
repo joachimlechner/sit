@@ -21,6 +21,7 @@ from tools_c import *
 # FIXME: make use of relative urls instead of full branches ?
 # FIXME: get rid of full path urls => use ^ instead
 
+
 ###############################################################
 class sit_c:
     
@@ -517,7 +518,12 @@ class sit_c:
         p = re.compile('^(' + self.sandbox_root_path + ')(.*)')
         m = p.match(pathfile_decoded)
         if m:
-            return m.group(2)
+            p2  = re.compile("^([/]+)([^/].+)$")
+            m2 = p2.match(m.group(2))
+            if m2:
+                return m2.group(2)
+            else:
+                return m.group(2)
         else:
             raise SitExceptionDecode("Path/File not within in repository/sandbox area <" + pathfile_decoded + "> at sandbox root <" + self.sandbox_root_path + ">")
 
@@ -662,7 +668,7 @@ class sit_c:
 
     ###############################################################
     def get_svnbasepath(self, path):
-        p = re.compile('^(.+)/@(\d+)$')
+        p = re.compile('^(.+)@(\d+)$')
         m = p.match(path)
         if m:
             return m.group(1)
@@ -796,8 +802,11 @@ class sit_c:
                     print(paths['path1'])
                     print(paths['path2'])
 
+                repository_from_fullpath = paths['path1']
                 repository_from_path = self.get_svnbasepath(paths['path1'])
                 repository_from_revision = self.get_svnbaserevision(paths['path1'])
+
+                repository_to_fullpath = paths['path2']
                 repository_to_path = self.get_svnbasepath(paths['path2'])
                 repository_to_revision = self.get_svnbaserevision(paths['path2'])
 
@@ -844,9 +853,9 @@ class sit_c:
                 for res in self.tools.run_external_command_and_get_results('svn diff --ignore-properties --summarize ' + paths['path1'] + ' ' + paths['path2'], parameters['verbose']):
                     if(parameters['debug']):
                         print("DIFF: " + res + "\n")
-                    p_modified = re.compile('^M(.*)\s+(' + repository_from_path + '|' + repository_to_path + ')/(\S+)$')
-                    p_added    = re.compile('^A(.*)\s+(' + repository_from_path + '|' + repository_to_path + ')/(\S+)$')
-                    p_deleted  = re.compile('^D(.*)\s+(' + repository_from_path + '|' + repository_to_path + ')/(\S+)$')
+                    p_modified = re.compile('^M(.*)\s+(' + repository_from_path + '|' + repository_to_path + ')/(\S+)\s*$')
+                    p_added    = re.compile('^A(.*)\s+(' + repository_from_path + '|' + repository_to_path + ')/(\S+)\s*$')
+                    p_deleted  = re.compile('^D(.*)\s+(' + repository_from_path + '|' + repository_to_path + ')/(\S+)\s*$')
                     m_modified = p_modified.match(res)
                     m_added    = p_added.match(res)
                     m_deleted  = p_deleted.match(res)
@@ -880,7 +889,7 @@ class sit_c:
                     print("to path: " + repository_to_path)
 
                 if (len(db['from.changed']) == 0) and (len(db['to.changed']) == 0):
-                    self.tools.status("No changes detected between paths <" + repository_from_path + "> and <" + repository_to_path + ">.")
+                    self.tools.status("No changes detected between paths <" + repository_from_fullpath + "> and <" + repository_to_fullpath + ">.")
                 else:
 
                     self.tools.process("Showing differences")
@@ -895,8 +904,8 @@ class sit_c:
                     self.tools.run_external_command('mkdir -p ' + compare_to_path, parameters['verbose'])
                     if parameters['diff_tool'][0] == "kdiff3":
                         if (len(db['from.changed']) == 0) or (len(db['to.changed']) == 0):
-                            self.tools.run_external_command('touch ' + compare_from_path + "/.sitdiff.ignoreme", parameters['verbose'])
-                            self.tools.run_external_command('touch ' + compare_to_path + "/.sitdiff.ignoreme", parameters['verbose'])
+                            self.tools.run_external_command('touch ' + compare_from_path + ".sitdiff.ignoreme", parameters['verbose'])
+                            self.tools.run_external_command('touch ' + compare_to_path + ".sitdiff.ignoreme", parameters['verbose'])
 
                     for filepath in db['from.changed']:
                         is_folder = False
@@ -909,8 +918,14 @@ class sit_c:
                             filepath_list = filepath.split('/')
                             filepath_list.pop() # get direcory path
                             filepath_path = '/'.join(filepath_list)
-                            compare_filepath = compare_from_path + '/' + filepath
-                            compare_filepath_path = compare_from_path + '/' + filepath_path
+                            compare_filepath = compare_from_path + filepath
+                            compare_filepath_path = compare_from_path + filepath_path
+                            if(parameters['debug']):
+                                print("compare_to_path: <" + compare_to_path + ">")
+                                print("filepath: <" + filepath + ">")
+                                print("filepath_path: <" + filepath_path + ">")
+                                print("compare_filepath: <" + compare_filepath + ">")
+                                print("compare_filepath_path: <" + compare_filepath_path + ">")
                             self.tools.run_external_command('mkdir -p ' + compare_filepath_path, parameters['verbose'])
                             if self.is_file_from_sandbox_folder(repository_from_path):
                                 self.tools.run_external_command('cat ' + repository_from_path + '/' + filepath + ' > ' + compare_filepath, parameters['verbose'])
@@ -928,8 +943,14 @@ class sit_c:
                             filepath_list = filepath.split('/')
                             filepath_list.pop() # get direcory path
                             filepath_path = '/'.join(filepath_list)
-                            compare_filepath = compare_to_path + '/' + filepath
-                            compare_filepath_path = compare_to_path + '/' + filepath_path
+                            compare_filepath = compare_to_path + filepath
+                            compare_filepath_path = compare_to_path + filepath_path
+                            if(parameters['debug']):
+                                print("compare_to_path: <" + compare_to_path + ">")
+                                print("filepath: <" + filepath + ">")
+                                print("filepath_path: <" + filepath_path + ">")
+                                print("compare_filepath: <" + compare_filepath + ">")
+                                print("compare_filepath_path: <" + compare_filepath_path + ">")
                             self.tools.run_external_command('mkdir -p ' + compare_filepath_path, parameters['verbose'])
                             if self.is_file_from_sandbox_folder(repository_to_path):
                                 self.tools.run_external_command('cat ' + repository_to_path + '/' + filepath + ' > ' + compare_filepath, parameters['verbose'])
@@ -1070,8 +1091,12 @@ class sit_c:
     def do_merge(self, path, revision, message, verbose=False):
         self.tools.process("Merging from " + path)
         command = "svn merge " + path + ' ' + revision + ' ' + self.get_relative_path_to_root()
-        self.tools.run_external_command(command, verbose)
-        
+        #self.tools.run_external_command(command, verbose) # does not work with interactive IO ! 
+        try:
+            self.tools.run_external_command_no_print(command, verbose)
+        except ToolException as e:
+            raise SitExceptionAbort("Detected issue during merge:\n" + str(e))
+            
     ###############################################################
     def get_new_stash_branch_name(self, name):
         # ^/stashes/<user>.<stash_name>.<branch_type>.<branch_name>

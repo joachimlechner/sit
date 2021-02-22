@@ -20,23 +20,28 @@ class tools_c:
     ###############################################################
     def info(self, message):
         print("INFO: " + message)
-
+        sys.stdout.flush()
+        
     ###############################################################
     def process(self, message):
         print("> " + message + " ...")
+        sys.stdout.flush()
 
     ###############################################################
     def status(self, message):
         print("> " + message + ":")
-
+        sys.stdout.flush()
+        
     ###############################################################
     def error(self, message):
         print("ERROR: " + message)
-
+        sys.stdout.flush()
+        
     ###############################################################
     def debug(self, message):
         print("DEBUG: " + message)
-
+        sys.stdout.flush()
+        
     ###############################################################
     def is_pathfile_existing(self, pathfile):
         return path.exists(pathfile)
@@ -52,6 +57,7 @@ class tools_c:
         return self.do_run_external_command(command, verbose, True, True, True)
         
     def do_run_external_command(self, command, verbose=False, ignore_exit_code=False, print_line=False, get_results=False):
+        sys.stdout.flush()
         if verbose:
             self.info("Executing command: <" + command + ">")
         try:
@@ -67,10 +73,11 @@ class tools_c:
                     #line = line_item.rstrip()
                     #line = line_item.decode("utf-16").rstrip()
                     # FIXME: what to use here ?!
-                    line = line_item.decode("ISO-8859-1").rstrip()
+                    line = line_item.decode("utf-8").rstrip()
                     results.append(line)
                     if print_line is True:
                         print(line)
+                        sys.stdout.flush()
                 exit_code = sp.wait()
         except subprocess.CalledProcessError as e:
             raise ToolException(e.output)
@@ -97,7 +104,8 @@ class tools_c:
                 #line = line_item.rstrip()
                 #line = line_item.decode("utf-16").rstrip()
                 # FIXME: what to use here ?!
-                line = line_item.decode("ISO-8859-1").rstrip()
+                # line = line_item.decode("ISO-8859-1").rstrip()
+                line = line_item.decode("utf-8").rstrip()
                 results.append(line)
             exit_code = sp.wait()
         except subprocess.CalledProcessError as e:

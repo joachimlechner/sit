@@ -82,11 +82,11 @@ A         t
  .============================================================================
  | Executing:  python .../../sit.py commit -m "test"
  |============================================================================
+> Committing data in . ...
 Adding         t
 Transmitting file data .done
 Committing transaction...
 Committed revision 2.
-> Committing data in . ...
 > Updating ...
 Updating '.':
 At revision 2.
@@ -114,9 +114,9 @@ At revision 2.
  .============================================================================
  | Executing:  python .../../sit.py branch testbranch -m "testbranch"
  |============================================================================
+> Copying ^/trunk@2 to ^/branches/<user>.testbranch ...
 Committing transaction...
 Committed revision 3.
-> Copying ^/trunk@2 to ^/branches/<user>.testbranch ...
  '============================================================================
 
 
@@ -124,14 +124,14 @@ Committed revision 3.
  |             ATTENTION: press ENTER to continue !!!
  | Executing:  python .../../sit.py branch testbranch2 -a
  |============================================================================
-Committing transaction...
-Committed revision 4.
 INFO: Repository and Sandbox Revision Missmatches. Select revision to branch from.
 What revision to branch from?
  [0] 2
 Select by entering the number (0-0) or abort with 'q': Selected: [0] 2
 
 > Copying ^/trunk@2 to ^/branches/<user>.testbranch2 ...
+Committing transaction...
+Committed revision 4.
  '============================================================================
 
 
@@ -154,11 +154,11 @@ A         t2
  .============================================================================
  | Executing:  python .../../sit.py commit -m "testbranch"
  |============================================================================
+> Committing data in . ...
 Adding         t2
 Transmitting file data .done
 Committing transaction...
 Committed revision 5.
-> Committing data in . ...
 > Updating ...
 Updating '.':
 At revision 5.
@@ -185,16 +185,16 @@ A         t3
  .============================================================================
  | Executing:  python .../../sit.py stash push 'test' -a
  |============================================================================
+> Copying ^/branches/<user>.testbranch2@5 to ^/stashes/<user>#test#branches#<user>.testbranch2#<DATE_TIME> ...
 Committing transaction...
 Committed revision 6.
+> Checking out ^/stashes/<user>#test#branches#<user>.testbranch2#<DATE_TIME>@HEAD ...
+At revision 6.
+> Committing data in . ...
 Adding         t3
 Transmitting file data .done
 Committing transaction...
 Committed revision 7.
-> Copying ^/branches/<user>.testbranch2@5 to ^/stashes/<user>#test#branches#<user>.testbranch2#<DATE_TIME> ...
-> Checking out ^/stashes/<user>#test#branches#<user>.testbranch2#<DATE_TIME>@HEAD ...
-At revision 6.
-> Committing data in . ...
 > Checking out ^/branches/<user>.testbranch2@5 ...
 D    t3
 Updated to revision 5.
@@ -245,21 +245,21 @@ A         t4
  |             ATTENTION: press ENTER to continue !!!
  | Executing:  python .../../sit.py stash push 'test2' -a
  |============================================================================
-Committing transaction...
-Committed revision 8.
-Adding         t4
-Transmitting file data .done
-Committing transaction...
-Committed revision 9.
 INFO: Repository and Sandbox Revision Missmatches. Select revision to branch from.
 What revision to branch from?
  [0] 5
 Select by entering the number (0-0) or abort with 'q': Selected: [0] 5
 
 > Copying ^/branches/<user>.testbranch2@5 to ^/stashes/<user>#test2#branches#<user>.testbranch2#<DATE_TIME> ...
+Committing transaction...
+Committed revision 8.
 > Checking out ^/stashes/<user>#test2#branches#<user>.testbranch2#<DATE_TIME>@HEAD ...
 At revision 8.
 > Committing data in . ...
+Adding         t4
+Transmitting file data .done
+Committing transaction...
+Committed revision 9.
 > Checking out ^/branches/<user>.testbranch2@5 ...
 D    t4
 Updated to revision 5.
@@ -278,12 +278,12 @@ Updated to revision 5.
  .============================================================================
  | Executing:  python .../../sit.py stash pop 'test'
  |============================================================================
-Reverted '.'
 > Merging from ^/stashes/<user>#test#branches#<user>.testbranch2#<DATE_TIME>/ ...
 --- Merging r7 into '.':
 A    t3
 --- Recording mergeinfo for merge of r7 into '.':
  U   .
+Reverted '.'
  '============================================================================
 
 
