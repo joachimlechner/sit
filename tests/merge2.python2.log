@@ -61,11 +61,11 @@ Checked out revision 1.
  |============================================================================
 > Adding ...
 A         test
+A         test/test_file1
+A         test/test_file2
 A         test/sub_test
 A         test/sub_test/sub_test_file1
 A         test/sub_test2
-A         test/test_file1
-A         test/test_file2
 A         test_file4
  '============================================================================
 
@@ -248,6 +248,7 @@ ERROR: Error detected:
 
 
  .============================================================================
+ |             select (p) for postpone the change
  | Executing:  python .../../sit.py merge test -f
  |============================================================================
 > Changed not committed files detected::

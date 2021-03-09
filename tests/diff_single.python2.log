@@ -1,0 +1,114 @@
+
+################################################
+# setup: Setup diff
+.../test_diff_single
+
+################################################
+# setup: create local repository (file system repository) server1
+.../test_diff_single/server1
+
+################################################
+# setup: create local / sandbox repository
+.../test_diff_single/server1_create
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_diff_single/server1/repo .
+ |============================================================================
+Checked out revision 0.
+ '============================================================================
+
+A         project
+A         project/sub_project
+A         project/sub_project/sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+Adding         project
+Adding         project/sub_project
+Adding         project/sub_project/sub_sub_project
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+Transmitting file data .done
+Committing transaction...
+Committed revision 1.
+
+################################################
+# setup: 
+
+################################################
+# setup: create local / sandbox repository for user1
+.../test_diff_single/user1
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_diff_single/server1/repo/project/sub_project//sub_sub_project/sub_sub_sub_project//trunk .
+ |============================================================================
+A    .svnignore
+Checked out revision 1.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py add *
+ |============================================================================
+> Adding ...
+A         file
+A         scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py commit . -m 'test'
+ |============================================================================
+> Committing data in . ...
+Adding         file
+Adding         scripts
+Transmitting file data ..done
+Committing transaction...
+Committed revision 2.
+> Updating ...
+Updating '.':
+At revision 2.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  svn status
+ |============================================================================
+M       file
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py diff file -t diff
+ |============================================================================
+> Detecting folders ...
+> Detected 1 folders in from:
+> Detected 0 folders in to:
+> Finding differences ...
+> Detected 1 changed elements in from:
+> Detected 1 changed elements in to:
+> Detected 0 not mached elements:
+> Showing differences ...
+> To Path Tree:
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/file
+> From Path Tree:
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/file
+> Differences:
+diff -s -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/file /tmp/sit.diff.<DATE_TIME>/from:sandbox/file
+1c1
+< file
+---
+> file_changed
+ '============================================================================
+

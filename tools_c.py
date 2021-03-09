@@ -19,21 +19,25 @@ class tools_c:
         
     ###############################################################
     def info(self, message):
+        sys.stdout.flush()
         print("INFO: " + message)
         sys.stdout.flush()
         
     ###############################################################
     def process(self, message):
+        sys.stdout.flush()
         print("> " + message + " ...")
         sys.stdout.flush()
 
     ###############################################################
     def status(self, message):
+        sys.stdout.flush()
         print("> " + message + ":")
         sys.stdout.flush()
         
     ###############################################################
     def error(self, message):
+        sys.stdout.flush()
         print("ERROR: " + message)
         sys.stdout.flush()
         
@@ -55,7 +59,7 @@ class tools_c:
 
     def run_external_command_ignore_status_and_print(self, command, verbose=False):
         return self.do_run_external_command(command, verbose, True, True, True)
-        
+    
     def do_run_external_command(self, command, verbose=False, ignore_exit_code=False, print_line=False, get_results=False):
         sys.stdout.flush()
         if verbose:
@@ -68,11 +72,7 @@ class tools_c:
             else:
                 sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 results = []
-                for line_item in sp.stdout: #.readlines():
-                    #line = line_item.decode("utf-8").rstrip() # orginally this was used - failed with pathnames ?!
-                    #line = line_item.rstrip()
-                    #line = line_item.decode("utf-16").rstrip()
-                    # FIXME: what to use here ?!
+                for line_item in sp.stdout:
                     line = line_item.decode("utf-8").rstrip()
                     results.append(line)
                     if print_line is True:
@@ -81,17 +81,24 @@ class tools_c:
                 exit_code = sp.wait()
         except subprocess.CalledProcessError as e:
             raise ToolException(e.output)
+        except OSError as e:
+            raise ToolException(e.output)
         except KeyboardInterrupt:
             raise ToolException("User abort.")
+        except BaseException as e:
+            raise ToolException("Error during execution:\n " + str(e))
 
         if ignore_exit_code is False:
             if exit_code != 0:
                 #print("\n<\n")
-                raise ToolException("Command <" + command + "> failed with message: \n\n" + '\n'.join(results) + "\n")
+                if get_results is False:
+                    raise ToolException("Command <" + command + "> failed with exit code <" + str(exit_code) + ">")
+                else:
+                    raise ToolException("Command <" + command + "> failed with exit code <" + str(exit_code) + "> and message: \n" + '\n'.join(results) + "\n")
         
         return exit_code
 
-
+            
     ###############################################################
     def run_external_command_and_get_results(self, command, verbose=False):
         if verbose:
@@ -99,25 +106,24 @@ class tools_c:
         try:
             sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             results = []
-            for line_item in sp.stdout: #.readlines():
-                #line = line_item.decode("utf-8").rstrip() # orginally this was used - failed with pathnames ?!
-                #line = line_item.rstrip()
-                #line = line_item.decode("utf-16").rstrip()
-                # FIXME: what to use here ?!
-                # line = line_item.decode("ISO-8859-1").rstrip()
+            for line_item in sp.stdout:
                 line = line_item.decode("utf-8").rstrip()
                 results.append(line)
             exit_code = sp.wait()
         except subprocess.CalledProcessError as e:
             raise ToolException(e.output)
+        except OSError as e:
+            raise ToolException(e.output)
         except KeyboardInterrupt:
             raise ToolException("User abort.")
+        except BaseException as e:
+            raise ToolException("Error during execution:\n " + str(e))
         
         if exit_code != 0:
             raise ToolException("Command <" + command + "> failed")
         
         return results
-    
+            
     ###############################################################
     def select_from_list(self, select_message, selections):
         if sys.version_info[0] == 3:

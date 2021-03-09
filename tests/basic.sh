@@ -65,6 +65,9 @@ execute "svn ls ^/stashes"
 #execute "$SIT diff trunk -t meld -v --debug "
 #execute "$SIT diff trunk -v --debug"
 execute "$SIT diff trunk -t diff"
+
+#execute "pwd"
+#execute "$SIT diff trunk -t diff -v --debug"
 #
 #execute "$SIT branch"
 

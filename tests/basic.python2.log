@@ -317,6 +317,13 @@ Reverted '.'
 > Detected 0 changed elements in to:
 > Detected 0 not mached elements:
 > Showing differences ...
+> To Path Tree:
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/
+> From Path Tree:
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/t2
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/t3
+> Differences:
 Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: t2
 Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: t3
  '============================================================================

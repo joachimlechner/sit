@@ -1,0 +1,299 @@
+
+################################################
+# setup: Setup diff
+.../test_diff3
+
+################################################
+# setup: create local repository (file system repository) server1
+.../test_diff3/server1
+
+################################################
+# setup: create local / sandbox repository
+.../test_diff3/server1_create
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_diff3/server1/repo .
+ |============================================================================
+Checked out revision 0.
+ '============================================================================
+
+A         project
+A         project/sub_project
+A         project/sub_project/sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+Adding         project
+Adding         project/sub_project
+Adding         project/sub_project/sub_sub_project
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
+Adding         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+Transmitting file data .done
+Committing transaction...
+Committed revision 1.
+
+################################################
+# setup: 
+
+################################################
+# setup: create local / sandbox repository for user1
+.../test_diff3/user1
+
+ .============================================================================
+ | Executing:  svn checkout file://.../test_diff3/server1/repo/project/sub_project//sub_sub_project/sub_sub_sub_project//trunk .
+ |============================================================================
+A    .svnignore
+Checked out revision 1.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py add *
+ |============================================================================
+> Adding ...
+A         dir
+A         dir/file_in__dir_to_svn_remove__to_modify
+A         dir/file_in__dir_to_remove__to_remove
+A         dir/file_in__dir__to_remove
+A         dir/file_in__dir_other__to_remove
+A         dir/file_in__dir
+A         dir/file_in__dir_to_modify__to_modify
+A         dir/file_in__dir_to_svn_remove__to_remove
+A         dir/file_in__dir_to_remove__to_modify
+A         dir/file_in__dir_to_modify__to_remove
+A         dir/file_in__dir__to_modify
+A         dir/file_in__dir_other__to_modify
+A         dir_link
+A         dir_other
+A         dir_other/file_in__dir_other
+A         dir_other_link
+A         dir_to_modify
+A         dir_to_modify/file_in__dir_to_modify
+A         dir_to_modify_link
+A         dir_to_remove
+A         dir_to_remove/file_in__dir_to_remove
+A         dir_to_remove_link
+A         dir_to_svn_remove
+A         dir_to_svn_remove/file_in__dir_to_svn_remove
+A         dir_to_svn_remove_link
+A         empty_dir
+A         empty_dir_other
+A         empty_dir_to_modify
+A         empty_dir_to_remove
+A         empty_dir_to_svn_remove
+A         file
+A         file_link
+A         file_link_to_modify
+A         file_link_to_remove
+A         file_link_to_svn_remove
+A         file_other
+A         file_to_modifiy
+A         file_to_remove
+A         file_to_svn_remove
+A         scripts
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py commit . -m 'init'
+ |============================================================================
+> Committing data in . ...
+Adding         dir
+Adding         dir/file_in__dir
+Adding         dir/file_in__dir__to_modify
+Adding         dir/file_in__dir__to_remove
+Adding         dir/file_in__dir_other__to_modify
+Adding         dir/file_in__dir_other__to_remove
+Adding         dir/file_in__dir_to_modify__to_modify
+Adding         dir/file_in__dir_to_modify__to_remove
+Adding         dir/file_in__dir_to_remove__to_modify
+Adding         dir/file_in__dir_to_remove__to_remove
+Adding         dir/file_in__dir_to_svn_remove__to_modify
+Adding         dir/file_in__dir_to_svn_remove__to_remove
+Adding         dir_link
+Adding         dir_other
+Adding         dir_other/file_in__dir_other
+Adding         dir_other_link
+Adding         dir_to_modify
+Adding         dir_to_modify/file_in__dir_to_modify
+Adding         dir_to_modify_link
+Adding         dir_to_remove
+Adding         dir_to_remove/file_in__dir_to_remove
+Adding         dir_to_remove_link
+Adding         dir_to_svn_remove
+Adding         dir_to_svn_remove/file_in__dir_to_svn_remove
+Adding         dir_to_svn_remove_link
+Adding         empty_dir
+Adding         empty_dir_other
+Adding         empty_dir_to_modify
+Adding         empty_dir_to_remove
+Adding         empty_dir_to_svn_remove
+Adding         file
+Adding         file_link
+Adding         file_link_to_modify
+Adding         file_link_to_remove
+Adding         file_link_to_svn_remove
+Adding         file_other
+Adding         file_to_modifiy
+Adding         file_to_remove
+Adding         file_to_svn_remove
+Adding         scripts
+Transmitting file data ..............................done
+Committing transaction...
+Committed revision 2.
+> Updating ...
+Updating '.':
+At revision 2.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py branch test -a
+ |============================================================================
+> Copying ^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk@2 to ^/project/sub_project/sub_sub_project/sub_sub_sub_project/branches/<user>.test ...
+Committing transaction...
+Committed revision 3.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py checkout test
+ |============================================================================
+> Checking out ^/project/sub_project/sub_sub_project/sub_sub_sub_project/branches/<user>.test@HEAD ...
+At revision 3.
+ '============================================================================
+
+D         file_to_svn_remove
+D         file_link_to_svn_remove
+D         empty_dir_to_svn_remove
+D         dir_to_svn_remove
+D         dir_to_svn_remove/file_in__dir_to_svn_remove
+D         dir_to_svn_remove_link
+A         empty_dir_to_modify_modified
+D         empty_dir_to_modify
+A         dir_to_modify_modified
+D         dir_to_modify
+D         dir_to_modify/file_in__dir_to_modify
+A         file_to_add
+A         file_link_to_add
+A         empty_dir_to_add
+A         dir_to_add
+A         dir_to_add/file_in__dir_to_add
+
+ .============================================================================
+ |             show status
+ | Executing:  python3 .../../sit.py status
+ |============================================================================
+> Changed:
+             > moved from dir_to_modify
+             > moved from empty_dir_to_modify
+             > moved to dir_to_modify_modified
+             > moved to empty_dir_to_modify_modified
+   A         dir_to_add
+   A         dir_to_add/file_in__dir_to_add
+   D         dir_to_modify
+   A  +      dir_to_modify_modified
+   !         dir_to_remove
+   !         dir_to_remove/file_in__dir_to_remove
+   !         dir_to_remove_link
+   D         dir_to_svn_remove
+   D         dir_to_svn_remove_link
+   A         empty_dir_to_add
+   D         empty_dir_to_modify
+   A  +      empty_dir_to_modify_modified
+   !         empty_dir_to_remove
+   D         empty_dir_to_svn_remove
+   A         file_link_to_add
+   M         file_link_to_modify
+   !         file_link_to_remove
+   D         file_link_to_svn_remove
+   A         file_to_add
+   M         file_to_modifiy
+   !         file_to_remove
+   D         file_to_svn_remove
+
+> Untracked:
+  ?          dir/dir_other
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python3 .../../sit.py diff -t diff
+ |============================================================================
+> Detecting folders ...
+> Detected 8 folders in from:
+> Detected 10 folders in to:
+> Finding differences ...
+> Detected 9 changed elements in from:
+> Detected 15 changed elements in to:
+> Detected 4 not mached elements:
+> Showing differences ...
+> To Path Tree:
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/dir_to_modify
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/dir_to_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/dir_to_remove/file_in__dir_to_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/dir_to_remove_link
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/dir_to_svn_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/dir_to_svn_remove_link
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/empty_dir_to_modify
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/empty_dir_to_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/empty_dir_to_svn_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_link_to_modify
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_link_to_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_link_to_svn_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_to_modifiy
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_to_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_to_svn_remove
+> From Path Tree:
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/dir_to_add
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/dir_to_add/file_in__dir_to_add
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/dir_to_modify_modified
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/empty_dir_to_add
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/empty_dir_to_modify_modified
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/file_link_to_add
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/file_link_to_modify
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/file_to_add
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/file_to_modifiy
+> Differences:
+Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: dir_to_add
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: dir_to_modify
+Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: dir_to_modify_modified
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: dir_to_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: dir_to_remove_link
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: dir_to_svn_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: dir_to_svn_remove_link
+Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: empty_dir_to_add
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: empty_dir_to_modify
+Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: empty_dir_to_modify_modified
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: empty_dir_to_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: empty_dir_to_svn_remove
+Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: file_link_to_add
+diff -s -r /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_link_to_modify /tmp/sit.diff.<DATE_TIME>/from:sandbox/file_link_to_modify
+1c1
+< link file
+\ No newline at end of file
+---
+> link file_other
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: file_link_to_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: file_link_to_svn_remove
+Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: file_to_add
+diff -s -r /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_to_modifiy /tmp/sit.diff.<DATE_TIME>/from:sandbox/file_to_modifiy
+1c1
+< file_to_modify
+---
+> file_to_modify => modified
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: file_to_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: file_to_svn_remove
+ '============================================================================
+

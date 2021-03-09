@@ -61,6 +61,10 @@ Checked out revision 1.
  |============================================================================
 > Adding ...
 A         test
+A         test/test_file1
+A         test/test_file2
+A         test/sub_sub_test_link3
+A         test/sub_test_link
 A         test/sub_test
 A         test/sub_test/test_file3
 A         test/sub_test2
@@ -68,10 +72,6 @@ A         test/sub_sub_test3_data_link
 A         test/sub_test3
 A         test/sub_test3/sub_sub_test3
 A         test/sub_test3/sub_sub_test3/test_file3
-A         test/test_file1
-A         test/test_file2
-A         test/sub_sub_test_link3
-A         test/sub_test_link
 A         test_file4
  '============================================================================
 
@@ -180,11 +180,23 @@ D         test_file1
 > Detected 5 folders in to:
 > Finding differences ...
 > Detected 1 changed elements in from:
-> Detected 2 changed elements in to:
-> Detected 0 not mached elements:
+> Detected 3 changed elements in to:
+> Detected 1 not mached elements:
 > Showing differences ...
+> To Path Tree:
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/sub_test_link
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file1
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2
+> From Path Tree:
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/test
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
+> Differences:
+Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test: sub_test_link
 Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test: test_file1
-diff -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
+diff -s -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
 1c1
 < test_data2
 ---
@@ -201,8 +213,8 @@ diff -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2 /tmp/sit.diff.<DATE
 > Finding differences ...
 > Detected 0 changed elements in from:
 > Detected 0 changed elements in to:
-> Detected 0 not mached elements:
-> No changes detected between paths <.../test_diff2/user1/test/sub_test> and <^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/test/sub_test@2>.:
+> Detected 1 not mached elements:
+> No changes detected between paths <.../test_diff2/user1/test/sub_test@sandbox> and <^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/test/sub_test@2>.:
  '============================================================================
 
 
@@ -224,11 +236,23 @@ M       test_file2
 > Detected 4 folders in to:
 > Finding differences ...
 > Detected 1 changed elements in from:
-> Detected 2 changed elements in to:
-> Detected 0 not mached elements:
+> Detected 3 changed elements in to:
+> Detected 1 not mached elements:
 > Showing differences ...
-Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@2/: test_file1
-diff -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test_file2 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test_file2
+> To Path Tree:
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/sub_test_link
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file1
+/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2
+> From Path Tree:
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/test
+/tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
+> Differences:
+Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test: sub_test_link
+Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test: test_file1
+diff -s -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
 1c1
 < test_data2
 ---

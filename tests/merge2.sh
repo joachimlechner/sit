@@ -69,7 +69,7 @@ cd test
 
     execute "$SIT merge test"
 
-    execute "$SIT merge test -f"
+    execute "$SIT merge test -f" "select (p) for postpone the change"
     execute "$SIT status"
 cd ../..
 

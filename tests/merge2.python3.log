@@ -248,6 +248,7 @@ ERROR: Error detected:
 
 
  .============================================================================
+ |             select (p) for postpone the change
  | Executing:  python3 .../../sit.py merge test -f
  |============================================================================
 > Changed not committed files detected::
