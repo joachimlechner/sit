@@ -21,12 +21,12 @@ A         project
 A         project/sub_project
 A         project/sub_project/sub_sub_project
 A         project/sub_project/sub_sub_project/sub_sub_sub_project
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
 Adding         project
 Adding         project/sub_project
 Adding         project/sub_project/sub_sub_project
@@ -57,16 +57,17 @@ Checked out revision 1.
 
 
  .============================================================================
- | Executing:  python .../../sit.py add test test_file4
+ | Executing:  python .../../sit.py add test test_file4 .sitconfig
  |============================================================================
 > Adding ...
 A         test
+A         test/test_file1
+A         test/test_file2
 A         test/sub_test1
 A         test/sub_test1/sub_test1_file1
 A         test/sub_test2
-A         test/test_file1
-A         test/test_file2
 A         test_file4
+A         .sitconfig
  '============================================================================
 
 
@@ -75,6 +76,7 @@ A         test_file4
  | Executing:  python .../../sit.py status
  |============================================================================
 > Changed:
+   A         .sitconfig
    A         test
    A         test/sub_test1
    A         test/sub_test1/sub_test1_file1
@@ -92,6 +94,7 @@ A         test_file4
  | Executing:  python .../../sit.py commit . -m 'test blabla'
  |============================================================================
 > Committing data in . ...
+Adding         .sitconfig
 Adding         test
 Adding         test/sub_test1
 Adding         test/sub_test1/sub_test1_file1
@@ -99,7 +102,7 @@ Adding         test/sub_test2
 Adding         test/test_file1
 Adding         test/test_file2
 Adding         test_file4
-Transmitting file data ....done
+Transmitting file data .....done
 Committing transaction...
 Committed revision 2.
 > Updating ...

@@ -26,7 +26,7 @@ echo "file2" > file2
 echo "file3" > file3
 
 ########################
-execute "$SIT add *"
+execute "$SIT add * .sitconfig"
 execute "$SIT commit . -m 'test'"
 
 echo "file_changed" > file1

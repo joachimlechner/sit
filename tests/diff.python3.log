@@ -57,16 +57,17 @@ Checked out revision 1.
 
 
  .============================================================================
- | Executing:  python3 .../../sit.py add test test_file4
+ | Executing:  python3 .../../sit.py add test test_file4 .sitconfig
  |============================================================================
 > Adding ...
 A         test
+A         test/test_file1
+A         test/test_file2
 A         test/sub_test
 A         test/sub_test/test_file3
 A         test/sub_test2
-A         test/test_file1
-A         test/test_file2
 A         test_file4
+A         .sitconfig
  '============================================================================
 
 
@@ -75,6 +76,7 @@ A         test_file4
  | Executing:  python3 .../../sit.py status
  |============================================================================
 > Changed:
+   A         .sitconfig
    A         test
    A         test/sub_test
    A         test/sub_test/test_file3
@@ -92,6 +94,7 @@ A         test_file4
  | Executing:  python3 .../../sit.py commit . -m 'test blabla'
  |============================================================================
 > Committing data in . ...
+Adding         .sitconfig
 Adding         test
 Adding         test/sub_test
 Adding         test/sub_test/test_file3
@@ -99,7 +102,7 @@ Adding         test/sub_test2
 Adding         test/test_file1
 Adding         test/test_file2
 Adding         test_file4
-Transmitting file data ....done
+Transmitting file data .....done
 Committing transaction...
 Committed revision 2.
 > Updating ...

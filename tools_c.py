@@ -4,9 +4,12 @@
 # Source:      https://github.com/joachimlechner/sit
 
 import subprocess
-
-from os import path
 import re
+import os
+#from os import path
+#import os.path
+#from os.path import abspath
+#from os import path
 
 import sys
 if sys.version_info[0] == 3:
@@ -15,6 +18,8 @@ if sys.version_info[0] == 3:
 ###############################################################
 class tools_c:
 
+    tools_debug = False
+    
     # def __init__(self):
         
     ###############################################################
@@ -123,7 +128,7 @@ class tools_c:
             raise ToolException("Command <" + command + "> failed")
         
         return results
-            
+    
     ###############################################################
     def select_from_list(self, select_message, selections):
         if sys.version_info[0] == 3:
@@ -172,6 +177,61 @@ class tools_c:
             result = selections[position]
             print("Selected: [" + str(num) + "] " + result + "\n")
         return result
+    
+    ###############################################################
+    # def does_path_exist(self, path):
+    #     if os.path.isdir(path):
+    #         return True
+    #     else:
+    #         return False
+
+    def does_file_exist(self, file):
+        if os.path.isfile(file):
+            return True
+        else:
+            return False
+
+    ###############################################################
+    def read_file(self, filename, line_comment_regex, max_nr_lines):
+        # Using readline() 
+        file_handle = open(filename, 'r')
+
+        line_nr = 0
+        data = []
+
+        while True:
+            line_nr += 1
+
+            if(line_nr > max_nr_lines):
+                raise ToolException("Max number of lines <" + max_nr_lines + "> reached when reading from <" + filename + ">")
+            
+            # Get next line from file 
+            line = file_handle.readline()
+
+            # if line is empty 
+            # end of file is reached 
+            if not line:
+                break
+
+            line_strip = line.strip()
+
+            if line_comment_regex:
+                p1 = re.compile('^(.*)' + line_comment_regex)
+                m1 = p1.match(line_strip)
+                if m1:
+                    line_strip = m1.group(1)
+                
+            p2 = re.compile('^\s*$')
+            m2 = p2.match(line_strip)
+            if not m2:
+                data.append(line_strip);
+                
+                if(self.tools_debug):
+                    print("read_file: " + filename + "@" + line_nr + ": " + line_strip)
+
+        file_handle.close()
+
+        return data
     
 ##########################################
 ##########################################

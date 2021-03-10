@@ -24,7 +24,7 @@ cd user1/
 echo "file" > file
 
 ########################
-execute "$SIT add *"
+execute "$SIT add * .sitconfig"
 execute "$SIT commit . -m 'test'"
 
 echo "file_changed" > file

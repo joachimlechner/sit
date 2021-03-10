@@ -21,12 +21,12 @@ A         project
 A         project/sub_project
 A         project/sub_project/sub_sub_project
 A         project/sub_project/sub_sub_project/sub_sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
 Adding         project
 Adding         project/sub_project
 Adding         project/sub_project/sub_sub_project
@@ -57,7 +57,7 @@ Checked out revision 1.
 
 
  .============================================================================
- | Executing:  python3 .../../sit.py add *
+ | Executing:  python3 .../../sit.py add * .sitconfig
  |============================================================================
 > Adding ...
 A         dir
@@ -100,6 +100,7 @@ A         file_to_modifiy
 A         file_to_remove
 A         file_to_svn_remove
 A         scripts
+A         .sitconfig
  '============================================================================
 
 
@@ -107,6 +108,7 @@ A         scripts
  | Executing:  python3 .../../sit.py commit . -m 'init'
  |============================================================================
 > Committing data in . ...
+Adding         .sitconfig
 Adding         dir
 Adding         dir/file_in__dir
 Adding         dir/file_in__dir__to_modify
@@ -147,7 +149,7 @@ Adding         file_to_modifiy
 Adding         file_to_remove
 Adding         file_to_svn_remove
 Adding         scripts
-Transmitting file data ..............................done
+Transmitting file data ...............................done
 Committing transaction...
 Committed revision 2.
 > Updating ...

@@ -14,6 +14,7 @@ function setup_path {
   mkdir $path 
   cd $path
   ln -s ../scripts .
+  cp ../.sitconfig .
   pwd
 }
 

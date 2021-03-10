@@ -32,7 +32,7 @@ mkdir sub_test2
 cd ..
 echo test_data4 > test_file4
 
-execute "$SIT add test test_file4"
+execute "$SIT add test test_file4 .sitconfig"
 execute "$SIT status" "show status"
 execute "$SIT commit . -m 'test blabla'"
 

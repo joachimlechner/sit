@@ -25,7 +25,7 @@ execute "$SIT branch" "show branches"
 
 ######################
 touch t
-execute "$SIT add t"
+execute "$SIT add t .sitconfig"
 execute "$SIT commit -m \"test\""
 execute "$SIT update"
 execute "$SIT status"

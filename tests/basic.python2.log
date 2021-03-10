@@ -54,6 +54,7 @@ Checked out revision 1.
  |============================================================================
 
 > Untracked:
+  ?          .sitconfig
   ?          scripts
  '============================================================================
 
@@ -72,10 +73,11 @@ stashes:
 
 
  .============================================================================
- | Executing:  python .../../sit.py add t
+ | Executing:  python .../../sit.py add t .sitconfig
  |============================================================================
 > Adding ...
 A         t
+A         .sitconfig
  '============================================================================
 
 
@@ -83,8 +85,9 @@ A         t
  | Executing:  python .../../sit.py commit -m "test"
  |============================================================================
 > Committing data in . ...
+Adding         .sitconfig
 Adding         t
-Transmitting file data .done
+Transmitting file data ..done
 Committing transaction...
 Committed revision 2.
 > Updating ...

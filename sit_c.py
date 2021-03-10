@@ -8,6 +8,7 @@ import re
 import os
 from os.path import abspath
 from os import path
+
 import time
 from pprint import pprint
 
@@ -27,7 +28,21 @@ class sit_c:
     
     ###############################################################
     # Members
+
+    sit_debug = False
     
+    ####################
+    # configuration
+    max_config_lines_to_read = 10000
+    cfg_editor = ""
+    cfg_difftool = "diff"
+    cfg_find_exclude_dir = []
+    cfg_auto_update_before_merge = True
+    cfg_auto_update_after_commit = True
+    cfg_disable_update_before_merge = False
+    cfg_disable_update_after_commit = False
+    
+    ####################
     sandbox_is_svn_path = False
     repository_url = ""
     repository_root = ""
@@ -135,9 +150,87 @@ class sit_c:
             else:
                 raise SitExceptionParseError("Cannot match branch type/name in <" + self.relative_url + ">")
 
+            self.read_configuration()
+
+    ###############################################################
+    def read_configuration(self):
+        # default configuration located at ~/.sitconfig override in repo/.sitconfig
+
+        self.read_configuration_from_file(os.path.expanduser("~") + "/.sitconfig")
+        self.read_configuration_from_file(self.sandbox_root_path + "/.sitconfig")
+    
+    ###############################################################
+    def read_configuration_from_file(self, filename):
+        if self.tools.does_file_exist(filename):
+            if self.sit_debug:
+                self.tools.debug("Reading configuration from " + filename)
+                
+            try:
+                data = self.tools.read_file(filename, "#", self.max_config_lines_to_read)
+            except ToolException as e:
+                raise SitException("Could not read data from " + filename + " beacuse:\n" + str(e))
+
+            # configuration lines of the form: foo = bar
+            p_editor = '^\s*EDITOR\s*=\s*(\S+.+)\s*$'
+            p_difftool = '^\s*DIFFTOOL\s*=\s*(\S+.+)\s*$'
+            p_find_exclude_dir = '^\s*FIND_EXCLUDE_DIR\s*=\s*(\S+.+)\s*$'
+            p_auto_update_after_commit = '^\s*AUTO_UPDATE_AFTER_COMMIT\s*=\s*(\S+.+)\s*$'
+            p_auto_update_before_merge = '^\s*AUTO_UPDATE_BEFORE_MERGE\s*=\s*(\S+.+)\s*$'
+            p_disable_update_after_commit = '^\s*DISABLE_UPDATE_AFTER_COMMIT\s*=\s*(\S+.+)\s*$'
+            p_disable_update_before_merge = '^\s*DISABLE_UPDATE_BEFORE_MERGE\s*=\s*(\S+.+)\s*$'
+            
+            for data_item in data:
+                self.cfg_editor = self.decode_cfg_data(self.cfg_editor, p_editor, data_item)
+                self.cfg_difftool = self.decode_cfg_data(self.cfg_difftool, p_difftool, data_item)
+                
+                self.cfg_auto_update_after_commit = self.decode_cfg_data_true_false(self.cfg_auto_update_after_commit, p_auto_update_after_commit, data_item)
+                self.cfg_auto_update_before_merge = self.decode_cfg_data_true_false(self.cfg_auto_update_before_merge, p_auto_update_before_merge, data_item)
+                self.cfg_disable_update_after_commit = self.decode_cfg_data_true_false(self.cfg_disable_update_after_commit, p_disable_update_after_commit, data_item)
+                self.cfg_disable_update_before_merge = self.decode_cfg_data_true_false(self.cfg_disable_update_before_merge, p_disable_update_before_merge, data_item)
+
+                new_find_exclude_dir = self.decode_cfg_data_list(self.cfg_find_exclude_dir, p_find_exclude_dir, data_item)
+                if new_find_exclude_dir:
+                    self.cfg_find_exclude_dir.append(new_find_exclude_dir)
+                
+    ###############################################################
+    def decode_cfg_data_list(self, values, regular_expression, data):
+        return self.decode_cfg_data(None, regular_expression, data)
+                    
+    def decode_cfg_data(self, value, regular_expression, data):
+        p_data = re.compile(regular_expression)
+        m_data = p_data.match(data)
+        if m_data:
+            return m_data.group(1)
+        else:
+            return value
+
+    def decode_cfg_data_true_false(self, value, regular_expression, data):
+        value_next = self.decode_cfg_data(None, regular_expression, data)
+        p_true  = re.compile('^(1|True|TRUE)$')
+        p_false = re.compile('^(0|False|FALSE)$')
+        if value_next:
+            if p_true.match(value_next):
+                return True
+            elif p_false.match(value_next):
+                return False
+            else:
+                return value                
+        else:
+            return value
+    
     ###############################################################
     def show(self):
+
         if self.sandbox_is_svn_path:
+            print("---------------------------------------")
+            print("editor:                                                " + self.cfg_editor)
+            print("difftool:                                              " + self.cfg_difftool)
+            print("exclude dirs:                                          " + ', '.join(self.cfg_find_exclude_dir))
+            print("auto_update_before_merge:                              " + str(self.cfg_auto_update_before_merge))
+            print("disable_update_before_merge:                           " + str(self.cfg_disable_update_before_merge))
+            print("auto_update_after_commit:                              " + str(self.cfg_auto_update_after_commit))
+            print("disable_update_after_commit:                           " + str(self.cfg_disable_update_after_commit))
+            print("---------------------------------------")
             print("Path (sandbox_actual_path):                            " + self.sandbox_actual_path) 
             print("Relative path (relative_path):                         " + self.relative_path)
             print("Relative URL (relative_url):                           " + self.relative_url)
@@ -287,7 +380,14 @@ class sit_c:
             raise SitExceptionAbort("Aborting due execution error.\n" + str(e))
         else:
             
-            self.do_update(parameters['verbose'])
+            if not self.cfg_disable_update_after_commit:
+                if not self.cfg_auto_update_after_commit:
+                    tbd = 1
+                    #try:
+                    #    revision = self.tools.select_from_list("What revision to branch from?", choice)
+                    #except ToolException as e:
+                    #    raise SitExceptionAbort("Aborting due selection error.\n" + str(e))
+                self.do_update(parameters['verbose'])
         
     ###############################################################
     def do_commit(self, path, message, verbose):
@@ -295,6 +395,9 @@ class sit_c:
         command = "svn commit " + path
         if message:
             command = command + " -m \'" + message + '\''
+        elif self.cfg_editor != "":
+            command = "SVN_EDITOR=" + self.cfg_editor + " " + command
+            
         try:
             self.tools.run_external_command_no_print(command, verbose)
         except ToolException as e:
@@ -408,7 +511,10 @@ class sit_c:
         self.tools.process("Copying " + branch_from_url + "@" + branch_from_revision + " to " + branch_to_url)
         command = 'svn copy -r ' + branch_from_revision + ' ' + branch_from_url + ' ' + branch_to_url
         if message:
-                command = command + " -m \'" + message + "\'"
+            command = command + " -m \'" + message + "\'"
+        elif self.cfg_editor != "":
+            command = "SVN_EDITOR=" + self.cfg_editor + " " + command
+            
         try:
             self.tools.run_external_command_no_print(command, verbose)
             if not self.is_repository_url_existing(branch_to_url):
@@ -831,7 +937,15 @@ class sit_c:
             else:
                 path_to_use = path + "/"
                 # FIXME: better use status + svn ls of actual path with revision ?! we have lots of overhead if there are many local files !
-                command = "find " + path_to_use + " -type d | grep -v \.svn | grep -v ^\.$ | sed 's," + path_to_use + ",,g' | { grep -v '^$'" + ' || test $? = 1; }'
+                # find . \( -not \( -wholename '*/.svn*' -o -wholename '*/repo*' \) -o -prune \) -type d -print
+
+                find_prune = ""
+                if self.cfg_find_exclude_dir:
+                    find_prune = '\( -not \( -wholename \'' + '\' -o -wholename \''.join(self.cfg_find_exclude_dir) + '\' \) -o -prune \)'
+                
+                command = "find " + path_to_use + " " + find_prune + " -type d -print | grep -v \.svn | grep -v ^\.$ | sed 's," + path_to_use + ",,g' | { grep -v '^$'" + ' || test $? = 1; }'
+                # command = "find " + path_to_use + " -type d | grep -v \.svn | grep -v ^\.$ | sed 's," + path_to_use + ",,g' | { grep -v '^$'" + ' || test $? = 1; }'
+                
                 #command = "find " + path + " -type d | grep -v \.svn | grep -v ^\.$ | sed 's," + path + ",,g' | grep -v '^$'"
                 
                 for res in self.tools.run_external_command_and_get_results(command, verbose):
@@ -1445,8 +1559,12 @@ class sit_c:
 
                     self.tools.run_external_command('mkdir -p ' + compare_from_path, parameters['verbose'])
                     self.tools.run_external_command('mkdir -p ' + compare_to_path, parameters['verbose'])
+
+                    diff_tool = self.cfg_difftool
+                    if parameters['diff_tool'][0]:
+                        diff_tool = parameters['diff_tool'][0]
                     
-                    if parameters['diff_tool'][0] == "kdiff3":
+                    if diff_tool == "kdiff3":
                         if (len(db['from.changed']) == 0) or (len(db['to.changed']) == 0):
                             self.tools.run_external_command('touch ' + compare_from_path + ".sitdiff.ignoreme", parameters['verbose'])
                             self.tools.run_external_command('touch ' + compare_to_path + ".sitdiff.ignoreme", parameters['verbose'])
@@ -1456,7 +1574,7 @@ class sit_c:
                     self.create_compare_path(db, compare_to_path, "to", parameters['verbose'], parameters['debug'])
                     
                     # ------------------
-                    if parameters['diff_tool'][0] == "diff":
+                    if diff_tool == "diff":
                         self.tools.status("To Path Tree")
                         self.tools.run_external_command_ignore_status_and_print("find " + compare_to_path + " | sort", parameters['verbose'])
 #                        self.tools.run_external_command_ignore_status_and_print("tree -n " + compare_to_path, parameters['verbose'])
@@ -1464,9 +1582,9 @@ class sit_c:
                         self.tools.run_external_command_ignore_status_and_print("find " + compare_from_path + " | sort", parameters['verbose'])
 #                        self.tools.run_external_command_ignore_status_and_print("tree -n " + compare_from_path, parameters['verbose'])
                         self.tools.status("Differences")
-                        command = parameters['diff_tool'][0] + ' -s -r ' + compare_to_path + ' ' + compare_from_path
+                        command = diff_tool + ' -s -r ' + compare_to_path + ' ' + compare_from_path
                     else:
-                        command = parameters['diff_tool'][0] + ' ' + compare_to_path + ' ' + compare_from_path
+                        command = diff_tool + ' ' + compare_to_path + ' ' + compare_from_path
                     self.tools.run_external_command_ignore_status_and_print(command, parameters['verbose'])
 
                     # do not delete in case of debug !
@@ -1589,8 +1707,17 @@ class sit_c:
         branch_repository_url, branch_selected = self.select_branch_by_name(parameters['branch'][0], parameters['branch_type'][0], parameters['verbose'])
 
 
-        self.do_update(parameters['verbose'])
-            
+        if not self.cfg_disable_update_before_merge:
+            if not self.cfg_auto_update_before_merge:
+                
+                tbd = 1
+                #try:
+                #    revision = self.tools.select_from_list("What revision to branch from?", choice)
+                #except ToolException as e:
+                #    raise SitExceptionAbort("Aborting due selection error.\n" + str(e))
+                    
+            self.do_update(parameters['verbose'])
+                
         self.do_merge(branch_repository_url, "", parameters['verbose'])
 
     ###############################################################

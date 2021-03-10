@@ -44,7 +44,7 @@ do
 done
 
 ########################
-execute "$SIT add *"
+execute "$SIT add * .sitconfig"
 execute "$SIT commit . -m 'init'"
 execute "$SIT branch test -a"
 execute "$SIT checkout test"
