@@ -138,7 +138,7 @@ At revision 3.
 
 
  .============================================================================
- | Executing:  python3 .../../sit.py branch
+ | Executing:  python3 .../../sit.py branches
  |============================================================================
 trunk:
    trunk
@@ -251,7 +251,7 @@ ERROR: Error detected:
 
 
  .============================================================================
- |             select (p) for postpone the change
+ |             ATTENTION: press p to continue
  | Executing:  python3 .../../sit.py merge test -f
  |============================================================================
 > Changed not committed files detected::

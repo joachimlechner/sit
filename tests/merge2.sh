@@ -42,7 +42,7 @@ execute "$SIT branch test -a"
 
 #########################
 execute "$SIT checkout test"
-execute "$SIT branch"
+execute "$SIT branches"
 
 echo test_data4a > test_file4
 echo test_data5 > test_file5
@@ -69,7 +69,7 @@ cd test
 
     execute "$SIT merge test"
 
-    execute "$SIT merge test -f" "select (p) for postpone the change"
+    execute "$SIT merge test -f" "ATTENTION: press p to continue"
     execute "$SIT status"
 cd ../..
 

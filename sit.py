@@ -27,14 +27,20 @@ def cmd_status(**parameters):
 def cmd_commit(**parameters):
     the_sit.sit_commit(parameters)
 
+def cmd_info(**parameters):
+    the_sit.sit_info(parameters)
+    
 def cmd_add(**parameters):
     the_sit.sit_add(parameters)
 
 def cmd_remove(**parameters):
     the_sit.sit_remove(parameters)
-
+    
 def cmd_branch(**parameters):
     the_sit.sit_branch(parameters)
+
+def cmd_branches(**parameters):
+    the_sit.sit_branches(parameters)
 
 def cmd_checkout(**parameters):
     the_sit.sit_checkout(parameters)
@@ -81,8 +87,8 @@ if __name__ == '__main__':
         parser_sit_merge.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
         
         ########################
-        parser_sit_branch = subparsers.add_parser('branch', help="Show branches or create a branch from the current branch")
-        parser_sit_branch.add_argument('branch', nargs='?', help='The target branch, if missing all branches are considered')
+        parser_sit_branch = subparsers.add_parser('branch', help="Show actual branch or create a branch from the current branch")
+        parser_sit_branch.add_argument('branch', nargs='?', help='The target branch, if missing the actual branch is shown')
         parser_sit_branch.add_argument('-d', dest="avoid_user_name_prefix_to_branch", action='store_const', help='Do not append username to branch name when creating', const=True, default=False)
         parser_sit_branch.add_argument('-f', dest="ignore_modified_sandbox", action='store_const', help='Force creating of branch even if local modified folders/files exist', const=True, default=False)
         parser_sit_branch.add_argument('-t', dest="branch_type", nargs=1, default=the_sit.get_default_branch_type(), help='The branch type to use for branching to')
@@ -92,10 +98,21 @@ if __name__ == '__main__':
         parser_sit_branch.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
 
         ########################
+        parser_sit_branches = subparsers.add_parser('branches', help="Show branches or create a branch from the current branch")
+        parser_sit_branches.add_argument('-v', dest="verbose", action='store_const', help='Verbose what is done', const=True, default=False)
+        parser_sit_branches.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
+
+        ########################
         parser_sit_add = subparsers.add_parser('add', help="add files/folders to version control")
         parser_sit_add.add_argument('options', nargs='*', help='File(s)/Folder(s) to add', default="")
         parser_sit_add.add_argument('-v', dest="verbose", action='store_const', help='Verbose what is done', const=True, default=False)
         parser_sit_add.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
+
+        ########################
+        parser_sit_info = subparsers.add_parser('info', help="show info")
+        #parser_sit_info.add_argument('options', nargs='*', help='File(s)/Folder(s) to add', default="")
+        parser_sit_info.add_argument('-v', dest="verbose", action='store_const', help='Verbose what is done', const=True, default=False)
+        parser_sit_info.add_argument('--debug', dest="debug", action='store_const', help='Debug enable', const=True, default=False)
 
         ########################
         parser_sit_remove = {}
@@ -227,5 +244,9 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print("\n")
         the_tools.error("User Abort detected.")
+    except ToolException as e:
+        the_tools.error("Uncatched Tool Error detected:\n " + str(e)) # this should not happen but catch it here just in case
     except SitException as e:
         the_tools.error("Error detected:\n " + str(e))
+#    except BaseException as e:
+#        the_tools.error("Fatal Uncatched Error detected:\n " + str(e))

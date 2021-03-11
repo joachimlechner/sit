@@ -97,11 +97,12 @@ class sit_c:
             m = p.match(line)
             if m:
                 self.sandbox_root_path = str(m.group(1))
-            
-            p = re.compile(r'^Revision: (\d+)$')
-            m = p.match(line)
-            if m:
-                self.sandbox_revision = str(m.group(1))
+
+            # only revision on this folder ! != revision of sandbox !
+            #p = re.compile(r'^Revision: (\d+)$')
+            #m = p.match(line)
+            #if m:
+            #    self.sandbox_revision = str(m.group(1))
   
             p = re.compile(r'^URL: (.+)$')
             m = p.match(line)
@@ -110,12 +111,18 @@ class sit_c:
 
         if self.sandbox_is_svn_path:
 
+            for res in self.tools.run_external_command_and_get_results('svn info ' + self.sandbox_root_path + ' 2>/dev/null', verbose):
+                p = re.compile(r'^Revision: (\d+)$')
+                m = p.match(res)
+                if m:
+                    self.sandbox_revision = str(m.group(1))
+ 
             for res in self.tools.run_external_command_and_get_results('svn info ' + self.repository_url + ' 2>/dev/null', verbose):
                 p = re.compile(r'^Revision: (\d+)$')
                 m = p.match(res)
                 if m:
                     self.repository_revision = str(m.group(1))
-                    
+            
             relative_branch_root_url_list = self.relative_url.split("/")[::-1]
             
             # decode relative path
@@ -353,6 +360,12 @@ class sit_c:
     ###############################################################
     ###############################################################
     ###############################################################
+
+    ###############################################################
+    def sit_info(self, parameters):
+        self.show()
+
+    ###############################################################
     def sit_add(self, parameters):
         if(parameters['debug']):
             self.show()
@@ -414,30 +427,70 @@ class sit_c:
     def do_reset(self, path, verbose):
         self.tools.process("Resetting " + path)
         self.tools.run_external_command("svn revert -R " + path, verbose)
-        
+
     ###############################################################
-    def sit_branch(self, parameters):
+    def sit_branches(self, parameters):
         if(parameters['debug']):
             self.show()
-        
-        if not parameters['branch']:
-            # list branches
-            for i_branch_type in self.branch_types:
-                print(i_branch_type + ':')
-                if i_branch_type == "trunk": # FIXME: support differen trunk names
-                    command = 'svn ls ' + self.project_path + '/' + ' | grep trunk/'
-                else:
-                    command = 'svn ls ' + self.project_path + '/' + i_branch_type
 
+        self.do_list_branches(parameters)
+
+    ###############################################################
+    def do_list_branch(self, parameters):
+        actual_branch = []
+        for i_branch_type in self.branch_types:
+            if i_branch_type == "trunk": # FIXME: support differen trunk names
+                command = 'svn ls ' + self.project_path + '/' + ' | grep trunk/'
+            else:
+                command = 'svn ls ' + self.project_path + '/' + i_branch_type
+
+            try:
                 for branch_full_path in self.tools.run_external_command_and_get_results(command, parameters['verbose']):
                     p = re.compile(r'^([^/]+)/$')
                     m = p.match(branch_full_path)
                     if m:
                         branch_name = str(m.group(1))
                         if self.is_equal_to_branch(branch_name, i_branch_type):
-                            print(" * " + branch_name)
+                            actual_branch.append([i_branch_type, branch_name])
+            except ToolException as e:
+                if(parameters['debug']):
+                    self.tools.show("   (N/A)")
+
+        if len(actual_branch)==1:
+            self.tools.show(actual_branch[0][1])
+        else:
+            raise SitExceptionAbort("Could not detect branch name")
+            
+    ###############################################################
+    def do_list_branches(self, parameters):
+        # list branches
+        for i_branch_type in self.branch_types:
+            self.tools.show(i_branch_type + ':')
+            if i_branch_type == "trunk": # FIXME: support differen trunk names
+                command = 'svn ls ' + self.project_path + '/' + ' | grep trunk/'
+            else:
+                command = 'svn ls ' + self.project_path + '/' + i_branch_type
+
+            try:
+                for branch_full_path in self.tools.run_external_command_and_get_results(command, parameters['verbose']):
+                    p = re.compile(r'^([^/]+)/$')
+                    m = p.match(branch_full_path)
+                    if m:
+                        branch_name = str(m.group(1))
+                        if self.is_equal_to_branch(branch_name, i_branch_type):
+                            self.tools.show(" * " + branch_name)
                         else:
-                            print("   " + branch_name)
+                            self.tools.show("   " + branch_name)
+            except ToolException as e:
+                self.tools.show("   (N/A)")
+                
+    ###############################################################
+    def sit_branch(self, parameters):
+        if(parameters['debug']):
+            self.show()
+        
+        if not parameters['branch']:
+            self.do_list_branch(parameters)
         else:
             # create branch from current branch + revision
             # os.environ['HOME']
@@ -475,6 +528,7 @@ class sit_c:
             if self.is_repository_url_existing(branch_to_url):
                 raise SitExceptionAbort("Aborting operation. There is already a branch with the same name existing <" + branch_to_url + ">.")
 
+            # are we up to date ?
             if self.repository_revision == self.sandbox_revision:
                 if message is "auto_message":
                     message = self.auto_message_prefix + "creating branch " + branch + " (" + branch_to_url + ") from " + self.relative_branch_root_url + "@" + self.repository_revision
@@ -482,6 +536,7 @@ class sit_c:
                 return self.repository_revision
             else:
                 revisions = []
+                revisions.append(self.sandbox_revision)
                 log = ""
                 for res in self.tools.run_external_command_and_get_results('svn log -r' + self.sandbox_revision + ':' + self.repository_revision + ' ' + self.relative_branch_root_url, verbose):
                     p = re.compile(r'^r(\d+) | ')
@@ -489,16 +544,20 @@ class sit_c:
                     if m:
                         revisions.append(str(m.group(1)))
                     log = log + res
-                
-                if revisions:
+
+                revisions = list(set(revisions)) # uniquify revisions
+                     
+                if len(revisions) == 1:
+                    revision = revisions[0]
+                    # if nothing changed then use sandbox revision ?! -
+                    # this happens when somewhere else a branch got committed ??? local commits without update should not end in this situation !
+                else:
                     self.tools.info("Repository and Sandbox Revision Missmatches. Select revision to branch from.")
                     try:
                         revision = self.tools.select_from_list("What revision to branch from?", revisions)
                     except ToolException as e:
                         raise SitExceptionAbort("Aborting due selection error.\n" + str(e))
-                else:
-                    # if nothing changed then use sandbox revision ?! -
-                    # this happens when somewhere else a branch got committed ??? local commits without update should not end in this situation !
+
                     revision = self.sandbox_revision
 
                 if message is "auto_message":
@@ -1322,8 +1381,8 @@ class sit_c:
                 # sandbox to head same branch for all
 
                 try:
-                    paths_try = self.try_to_decode_branch_path(self.sandbox_branch_id                                                 , self.relative_path,
-                                                               self.branch_type + ":" + self.branch_name + "@" + self.sandbox_revision, self.relative_path,
+                    paths_try = self.try_to_decode_branch_path(self.sandbox_branch_id                                                    , self.relative_path,
+                                                               self.branch_type + ":" + self.branch_name + "@" + self.repository_revision, self.relative_path,
                                                                parameters['verbose'],
                                                                parameters['debug'])
             
@@ -1407,10 +1466,10 @@ class sit_c:
                 if db['from.is_sandbox']:
                     if db['from.single_file']:
                         db['from.svndiff_path_base'] = self.relative_branch_root_url
-                        db['from.svndiff_path'] = self.relative_branch_root_url + "/" + self.decode_pathfile_absolute_to_sandbox_root_path(db['from.path']) + "@" + self.sandbox_revision
+                        db['from.svndiff_path'] = self.relative_branch_root_url + "/" + self.decode_pathfile_absolute_to_sandbox_root_path(db['from.path']) + "@" + self.repository_revision
                     else:
                         db['from.svndiff_path_base'] = self.relative_branch_root_url
-                        db['from.svndiff_path'] = self.relative_branch_root_url + "/" + db['from.subpath'] + "@" + self.sandbox_revision
+                        db['from.svndiff_path'] = self.relative_branch_root_url + "/" + db['from.subpath'] + "@" + self.repository_revision
                         # self.decode_pathfile_relative_to_sandbox_root_path(self.relative_path)
                 else:
                     db['from.svndiff_path_base'] = db['from.path']
@@ -1419,10 +1478,10 @@ class sit_c:
                 if db['to.is_sandbox']:
                     if db['to.single_file']:
                         db['to.svndiff_path_base'] = self.relative_branch_root_url
-                        db['to.svndiff_path'] = self.relative_branch_root_url + "/" + self.decode_pathfile_absolute_to_sandbox_root_path(db['to.path']) + "@" + self.sandbox_revision 
+                        db['to.svndiff_path'] = self.relative_branch_root_url + "/" + self.decode_pathfile_absolute_to_sandbox_root_path(db['to.path']) + "@" + self.repository_revision
                     else:
                         db['to.svndiff_path_base'] = self.relative_branch_root_url
-                        db['to.svndiff_path'] = self.relative_branch_root_url + "/" + db['to.subpath'] + "@" + self.sandbox_revision
+                        db['to.svndiff_path'] = self.relative_branch_root_url + "/" + db['to.subpath'] + "@" + self.repository_revision
                         # self.decode_pathfile_relative_to_sandbox_root_path(self.relative_path)
                 else:
                     db['to.svndiff_path_base'] = db['to.path']

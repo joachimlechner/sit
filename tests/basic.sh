@@ -21,7 +21,8 @@ cd user1/
 
 ######################
 execute "$SIT status" "show status"
-execute "$SIT branch" "show branches"
+execute "$SIT branches" "show branches"
+execute "$SIT branch" "show branch"
 
 ######################
 touch t
@@ -32,7 +33,7 @@ execute "$SIT status"
 
 ######################
 execute "$SIT branch testbranch -m \"testbranch\""
-execute "$SIT branch testbranch2 -a" "ATTENTION: press ENTER to continue !!!"
+execute "$SIT branch testbranch2 -a"
 
 execute "$SIT checkout testbranch2"
 
@@ -46,13 +47,13 @@ execute "$SIT add t3"
 execute "$SIT stash push 'test' -a"
 execute "$SIT status"
 
-execute "$SIT branch"
+execute "$SIT branches"
 
 execute "$SIT stash list"
 
 touch t4
 execute "$SIT add t4"
-execute "$SIT stash push 'test2' -a" "ATTENTION: press ENTER to continue !!!"
+execute "$SIT stash push 'test2' -a"
 
 #execute "$SIT stash apply 'test'"
 execute "$SIT stash list"
@@ -71,4 +72,4 @@ execute "$SIT diff trunk -t diff"
 #
 #execute "$SIT branch"
 
-execute "$SIT branch"
+execute "$SIT branches"

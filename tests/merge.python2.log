@@ -21,12 +21,12 @@ A         project
 A         project/sub_project
 A         project/sub_project/sub_sub_project
 A         project/sub_project/sub_sub_project/sub_sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
 Adding         project
 Adding         project/sub_project
 Adding         project/sub_project/sub_sub_project
@@ -138,7 +138,7 @@ At revision 3.
 
 
  .============================================================================
- | Executing:  python .../../sit.py branch
+ | Executing:  python .../../sit.py branches
  |============================================================================
 trunk:
    trunk

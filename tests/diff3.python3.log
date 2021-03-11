@@ -61,10 +61,6 @@ Checked out revision 1.
  |============================================================================
 > Adding ...
 A         dir
-A         dir/file_in__dir_to_svn_remove__to_modify
-A         dir/file_in__dir_to_remove__to_remove
-A         dir/file_in__dir__to_remove
-A         dir/file_in__dir_other__to_remove
 A         dir/file_in__dir
 A         dir/file_in__dir_to_modify__to_modify
 A         dir/file_in__dir_to_svn_remove__to_remove
@@ -72,6 +68,10 @@ A         dir/file_in__dir_to_remove__to_modify
 A         dir/file_in__dir_to_modify__to_remove
 A         dir/file_in__dir__to_modify
 A         dir/file_in__dir_other__to_modify
+A         dir/file_in__dir_to_svn_remove__to_modify
+A         dir/file_in__dir_to_remove__to_remove
+A         dir/file_in__dir__to_remove
+A         dir/file_in__dir_other__to_remove
 A         dir_link
 A         dir_other
 A         dir_other/file_in__dir_other

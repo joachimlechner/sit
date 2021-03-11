@@ -42,7 +42,7 @@ execute "$SIT branch test -a"
 
 #########################
 execute "$SIT checkout test"
-execute "$SIT branch"
+execute "$SIT branches"
 
 echo test_data4a > test_file4
 echo test_data5 > test_file5

@@ -61,7 +61,7 @@ Checked out revision 1.
 
  .============================================================================
  |             show branches
- | Executing:  python3 .../../sit.py branch
+ | Executing:  python3 .../../sit.py branches
  |============================================================================
 trunk:
  * trunk
@@ -69,6 +69,14 @@ branches:
 tags:
 releases:
 stashes:
+ '============================================================================
+
+
+ .============================================================================
+ |             show branch
+ | Executing:  python3 .../../sit.py branch
+ |============================================================================
+trunk
  '============================================================================
 
 
@@ -124,14 +132,8 @@ Committed revision 3.
 
 
  .============================================================================
- |             ATTENTION: press ENTER to continue !!!
  | Executing:  python3 .../../sit.py branch testbranch2 -a
  |============================================================================
-INFO: Repository and Sandbox Revision Missmatches. Select revision to branch from.
-
-[?] What revision to branch from?: 2
- > 2
-
 > Copying ^/trunk@2 to ^/branches/<user>.testbranch2 ...
 Committing transaction...
 Committed revision 4.
@@ -215,7 +217,7 @@ Updated to revision 5.
 
 
  .============================================================================
- | Executing:  python3 .../../sit.py branch
+ | Executing:  python3 .../../sit.py branches
  |============================================================================
 trunk:
    trunk
@@ -245,14 +247,8 @@ A         t4
 
 
  .============================================================================
- |             ATTENTION: press ENTER to continue !!!
  | Executing:  python3 .../../sit.py stash push 'test2' -a
  |============================================================================
-INFO: Repository and Sandbox Revision Missmatches. Select revision to branch from.
-
-[?] What revision to branch from?: 5
- > 5
-
 > Copying ^/branches/<user>.testbranch2@5 to ^/stashes/<user>#test2#branches#<user>.testbranch2#<DATE_TIME> ...
 Committing transaction...
 Committed revision 8.
@@ -333,7 +329,7 @@ Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: t3
 
 
  .============================================================================
- | Executing:  python3 .../../sit.py branch
+ | Executing:  python3 .../../sit.py branches
  |============================================================================
 trunk:
    trunk

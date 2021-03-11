@@ -21,6 +21,12 @@ class tools_c:
     tools_debug = False
     
     # def __init__(self):
+
+    ###############################################################
+    def show(self, message):
+        sys.stdout.flush()
+        print(message)
+        sys.stdout.flush()
         
     ###############################################################
     def info(self, message):

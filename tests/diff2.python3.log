@@ -21,12 +21,12 @@ A         project
 A         project/sub_project
 A         project/sub_project/sub_sub_project
 A         project/sub_project/sub_sub_project/sub_sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
 Adding         project
 Adding         project/sub_project
 Adding         project/sub_project/sub_sub_project
@@ -61,8 +61,6 @@ Checked out revision 1.
  |============================================================================
 > Adding ...
 A         test
-A         test/sub_test2
-A         test/sub_sub_test3_data_link
 A         test/sub_test3
 A         test/sub_test3/sub_sub_test3
 A         test/sub_test3/sub_sub_test3/test_file3
@@ -72,6 +70,8 @@ A         test/sub_sub_test_link3
 A         test/sub_test_link
 A         test/sub_test
 A         test/sub_test/test_file3
+A         test/sub_test2
+A         test/sub_sub_test3_data_link
 A         test_file4
 A         .sitconfig
  '============================================================================

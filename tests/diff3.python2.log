@@ -21,12 +21,12 @@ A         project
 A         project/sub_project
 A         project/sub_project/sub_sub_project
 A         project/sub_project/sub_sub_project/sub_sub_sub_project
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
 Adding         project
 Adding         project/sub_project
 Adding         project/sub_project/sub_sub_project
@@ -61,6 +61,10 @@ Checked out revision 1.
  |============================================================================
 > Adding ...
 A         dir
+A         dir/file_in__dir_to_remove__to_modify
+A         dir/file_in__dir_to_modify__to_remove
+A         dir/file_in__dir__to_modify
+A         dir/file_in__dir_other__to_modify
 A         dir/file_in__dir_to_svn_remove__to_modify
 A         dir/file_in__dir_to_remove__to_remove
 A         dir/file_in__dir__to_remove
@@ -68,10 +72,6 @@ A         dir/file_in__dir_other__to_remove
 A         dir/file_in__dir
 A         dir/file_in__dir_to_modify__to_modify
 A         dir/file_in__dir_to_svn_remove__to_remove
-A         dir/file_in__dir_to_remove__to_modify
-A         dir/file_in__dir_to_modify__to_remove
-A         dir/file_in__dir__to_modify
-A         dir/file_in__dir_other__to_modify
 A         dir_link
 A         dir_other
 A         dir_other/file_in__dir_other
