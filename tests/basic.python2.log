@@ -308,23 +308,58 @@ Reverted '.'
  .============================================================================
  | Executing:  python .../../sit.py diff trunk -t diff
  |============================================================================
+ERROR: Error detected:
+ SitExceptionAbort: Could not decode arguments because:
+  SitExceptionDecode: Could not decode 1 arguments because:
+  Could not decode <pathfile> because:
+  SitExceptionDecode: Could not decode because:
+  SitExceptionDecode: Could not decode path FROM <sandbox_branch_id/trunk> because:
+  SitExceptionDecode: Path does not exist: .../test_basic/user1/trunk
+ and 
+  Could not decode <branch> because:
+  Not yet supported complex sandbox diff.
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py diff -t diff
+ |============================================================================
 > Detecting folders ...
 > Detected 0 folders in from:
 > Detected 0 folders in to:
 > Finding differences ...
-> Detected 2 changed elements in from:
+> Detected 1 changed elements in from:
 > Detected 0 changed elements in to:
 > Detected 0 not mached elements:
 > Showing differences ...
 > To Path Tree:
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.testbranch2@BASE/
 > From Path Tree:
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/
-/tmp/sit.diff.<DATE_TIME>/from:sandbox/t2
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/t3
 > Differences:
-Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: t2
 Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: t3
+ '============================================================================
+
+
+ .============================================================================
+ | Executing:  python .../../sit.py diff trunk testbranch2 -t diff
+ |============================================================================
+> Detecting folders ...
+> Detected 0 folders in from:
+> Detected 0 folders in to:
+> Finding differences ...
+> Detected 0 changed elements in from:
+> Detected 1 changed elements in to:
+> Detected 0 not mached elements:
+> Showing differences ...
+> To Path Tree:
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.testbranch2@5/
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.testbranch2@5/t2
+> From Path Tree:
+/tmp/sit.diff.<DATE_TIME>/from:trunk@2/
+> Differences:
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.testbranch2@5/: t2
  '============================================================================
 
 

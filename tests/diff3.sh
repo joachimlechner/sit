@@ -105,7 +105,12 @@ svn add dir_to_add
 execute "$SIT status" "show status"
 
 execute "$SIT diff -t diff"
-#execute "$SIT diff -v --debug"
+
+
+#execute "$SIT diff -v --debug -t diff"
+#execute "$SIT diff -v --debug -t kdiff3"
+#execute "$SIT diff trunk joachim.test -v --debug -t kdiff3"
+#execute "$SIT diff -v --debug -t diff trunk"
 
 # execute "$SIT diff trunk"
 

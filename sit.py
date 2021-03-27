@@ -244,8 +244,8 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print("\n")
         the_tools.error("User Abort detected.")
-    except ToolException as e:
-        the_tools.error("Uncatched Tool Error detected:\n " + str(e)) # this should not happen but catch it here just in case
+#    except ToolException as e:
+#        the_tools.error("Uncatched Tool Error detected:\n " + str(e)) # this should not happen but catch it here just in case
     except SitException as e:
         the_tools.error("Error detected:\n " + str(e))
 #    except BaseException as e:

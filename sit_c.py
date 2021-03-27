@@ -110,18 +110,6 @@ class sit_c:
                 self.repository_url = str(m.group(1))
 
         if self.sandbox_is_svn_path:
-
-            for res in self.tools.run_external_command_and_get_results('svn info ' + self.sandbox_root_path + ' 2>/dev/null', verbose):
-                p = re.compile(r'^Revision: (\d+)$')
-                m = p.match(res)
-                if m:
-                    self.sandbox_revision = str(m.group(1))
- 
-            for res in self.tools.run_external_command_and_get_results('svn info ' + self.repository_url + ' 2>/dev/null', verbose):
-                p = re.compile(r'^Revision: (\d+)$')
-                m = p.match(res)
-                if m:
-                    self.repository_revision = str(m.group(1))
             
             relative_branch_root_url_list = self.relative_url.split("/")[::-1]
             
@@ -159,6 +147,20 @@ class sit_c:
 
             self.read_configuration()
 
+    ###############################################################
+    def get_revisions(self, verbose):
+        for res in self.tools.run_external_command_and_get_results('svn info ' + self.sandbox_root_path + ' 2>/dev/null', verbose):
+            p = re.compile(r'^Revision: (\d+)$')
+            m = p.match(res)
+            if m:
+                self.sandbox_revision = str(m.group(1))
+ 
+        for res in self.tools.run_external_command_and_get_results('svn info ' + self.repository_url + ' 2>/dev/null', verbose):
+            p = re.compile(r'^Revision: (\d+)$')
+            m = p.match(res)
+            if m:
+                self.repository_revision = str(m.group(1))
+            
     ###############################################################
     def read_configuration(self):
         # default configuration located at ~/.sitconfig override in repo/.sitconfig
@@ -229,6 +231,9 @@ class sit_c:
     def show(self):
 
         if self.sandbox_is_svn_path:
+
+            self.get_revisions(0)
+            
             print("---------------------------------------")
             print("editor:                                                " + self.cfg_editor)
             print("difftool:                                              " + self.cfg_difftool)
@@ -412,7 +417,7 @@ class sit_c:
             command = "SVN_EDITOR=" + self.cfg_editor + " " + command
             
         try:
-            self.tools.run_external_command_no_print(command, verbose)
+            self.tools.run_external_command_print(command, verbose)
         except ToolException as e:
             raise SitExceptionAbort("Aborting due execution error.\n" + str(e))
         
@@ -529,6 +534,10 @@ class sit_c:
                 raise SitExceptionAbort("Aborting operation. There is already a branch with the same name existing <" + branch_to_url + ">.")
 
             # are we up to date ?
+
+            
+            self.get_revisions(verbose)
+            
             if self.repository_revision == self.sandbox_revision:
                 if message is "auto_message":
                     message = self.auto_message_prefix + "creating branch " + branch + " (" + branch_to_url + ") from " + self.relative_branch_root_url + "@" + self.repository_revision
@@ -575,7 +584,7 @@ class sit_c:
             command = "SVN_EDITOR=" + self.cfg_editor + " " + command
             
         try:
-            self.tools.run_external_command_no_print(command, verbose)
+            self.tools.run_external_command_print(command, verbose)
             if not self.is_repository_url_existing(branch_to_url):
                 raise SitExceptionAbort("Failed to copy " + branch_from_url + "@" + branch_from_revision + " to " + branch_to_url)
         except ToolException as e:
@@ -613,14 +622,14 @@ class sit_c:
                         m = p.match(branch_name)
                         if m:
                             branches.append(i_branch_type + '/' + branch_name)
-  
+        
         if len(branches)>1:
             try:
                 full_branch = self.tools.select_from_list("Which branch to you mean ?", branches)
             except ToolException as e:
                 raise SitExceptionAbort("Aborting due selection error.\n" + str(e))
         elif len(branches)==0:
-            return None
+            return None, None
         else:
             full_branch = branches[0]
 
@@ -752,15 +761,40 @@ class sit_c:
             return str(m.group(1))
         else:
             raise SitExceptionDecode("Could not find revision <head-" + str(revision_backwards_from_head) + '> for <' + repository_branch_url_pathfile + '>')
-
+        
+    ###############################################################
+    def is_valid_svn_pathfile(self, pathfile, verbose):
+        try:
+            if self.is_sandbox(pathfile) :
+                command = "ls " + pathfile
+            else:
+                command = "svn ls " + pathfile
+            self.tools.run_external_command_no_print(command, verbose)
+        except ToolException as e:
+            return False
+        else:
+            return True
+        
     ###############################################################
     def is_valid_svn_pathfile_revision(self, repository_branch_url_pathfile, revision, verbose):
-        for res in self.tools.run_external_command_and_get_results('svn ls -r ' + revision + ' ' + repository_branch_url_pathfile, verbose):
-            p = re.compile(r'^svn: E')
-            m = p.match(res)
-            if m:
-                return False
-        return True
+        try:
+            #if revision == "HEAD":
+            #    return True
+            #elif revision == "PREV":
+            #    return True
+            #el
+            if revision == "BASE":
+                return True
+            else:
+                for res in self.tools.run_external_command_and_get_results('svn ls -r ' + revision + ' ' + repository_branch_url_pathfile, verbose):
+                    p = re.compile(r'^svn: E')
+                    m = p.match(res)
+                    if m:
+                        return False
+                    return True
+        except ToolException as e:
+            return False
+        
         
     ###############################################################
     # Description:
@@ -784,22 +818,20 @@ class sit_c:
         data = {}
 
         if debug:
-            self.tools.debug("<<<")
+            self.tools.debug("")
+            self.tools.debug("^^^")
             self.tools.debug("branch:   " + branch)
             self.tools.debug("pathfile: " + pathfile)
             
         if branch == self.sandbox_branch_id:
             pathfile_decoded = self.decode_pathfile_relative_to_sandbox_root_path(pathfile)
-            if pathfile_decoded == "":
-                data['path'] = self.sandbox_root_path
-            else:
-                data['path'] = self.sandbox_root_path + "/" + pathfile_decoded
+            data['path'] = self.merge_path(self.sandbox_root_path, pathfile_decoded)
             data['basepath'] = self.sandbox_root_path
             data['subpath'] = pathfile_decoded
             data['branch'] = "sandbox"
             data['revision'] = "sandbox"
             data['is_sandbox'] = True
-
+            
             if debug:
                 self.tools.debug("=> sandbox")
                 self.tools.debug("pathfile: " + pathfile)
@@ -816,7 +848,7 @@ class sit_c:
 
                 if branch_name == '':
                     branch_name = self.branch_name
-
+                    
                 if not m.group(2):
                     if str(m.group(3)) == '':
                         branch_type = self.branch_type
@@ -831,10 +863,16 @@ class sit_c:
                         branch_type = str(m_type.group(1))
                     else:
                         raise SitExceptionDecode("Could not match branch type <" + m.group(2) + "> in types <" + '|'.join(self.branch_types) + ">")
-           
-                repository_branch_url = self.get_branch_repository_url(branch_name, branch_type)
+
+                repository_branch_url, branch_selected = self.select_branch_by_name(branch_name, branch_type, verbose)
+                if repository_branch_url is None:
+                    raise SitExceptionDecode("Undecodable branch <" + branch_type + "> <" + branch_name + ">")
+                else:
+                    branch_name = branch_selected[1]
+
                 pathfile_decoded = self.decode_pathfile_relative_to_sandbox_root_path(pathfile)
-                repository_branch_url_pathfile = repository_branch_url + '/' + pathfile_decoded
+                
+                repository_branch_url_pathfile = self.merge_path(repository_branch_url, pathfile_decoded)
                 
                 if debug:
                     self.tools.debug("=> url")
@@ -853,24 +891,33 @@ class sit_c:
                     revision_to_decode = m.group(5)
                     p_prev   = re.compile('^(prev|PREV)$')
                     p_head   = re.compile('^(head|HEAD)$')
+                    p_base   = re.compile('^(base|BASE)$')
                     p_number = re.compile('^(\d+)$')
                     p_prevnr = re.compile('^-(\d+)$')
                     m_prev   = p_prev.match(revision_to_decode)
                     m_head   = p_head.match(revision_to_decode)
+                    m_base   = p_base.match(revision_to_decode)
                     m_number = p_number.match(revision_to_decode)
                     m_prevnr = p_prevnr.match(revision_to_decode)
-           
-                    revision = int(self.get_repository_pathfile_revision(repository_branch_url_pathfile, 0, verbose))
-           
+
+                    # revision = int(self.get_repository_pathfile_revision(repository_branch_url_pathfile, 0, verbose))
+                    
                     if m_prev:
-                        revision = revision - 1
+                        #revision = revision - 1
+                        #revision = "PREV"
+                        raise SitException("Not supported yet")
                     elif m_head:
                         # keep as is
-                        revision = revision + 0
+                        # revision = revision + 0
+                        #revision = "HEAD"
+                        raise SitException("Not supported yet")
+                    elif m_base:
+                        revision = "BASE"
                     elif m_number:
                         # check revision exists for below !
                         revision = int(m_number.group(1))
                     elif m_prevnr:
+                        revision = int(self.get_repository_pathfile_revision(repository_branch_url_pathfile, 0, verbose))
                         revision =  revision - int(m_prevnr.group(1))
                     else:
                         raise SitExceptionDecode("Could not match revision information <" + revision_to_decode + ">")
@@ -888,13 +935,19 @@ class sit_c:
                 raise SitExceptionDecode("Could not match to be any branch specification <" + branch + ">")
                 
         if debug:
-            self.tools.debug("basepath:      " + data['basepath'])
-            self.tools.debug("subpath:       " + data['subpath'])
-            self.tools.debug("branch:        " + data['branch'])
-            self.tools.debug("revision:      " + data['revision'])
-            self.tools.debug("is sandbox:    " + str(data['is_sandbox']))
-            self.tools.debug(">>>")
-                
+            self.tools.debug("basepath:          " + data['basepath'])
+            self.tools.debug("subpath:           " + data['subpath'])
+            self.tools.debug("branch:            " + data['branch'])
+            self.tools.debug("revision:          " + data['revision'])
+            self.tools.debug("is sandbox:        " + str(data['is_sandbox']))
+            self.tools.debug("vvv")
+            self.tools.debug("")
+
+        # check for path to be a valid one
+        full_path = self.merge_path(data['basepath'], data['subpath'])
+        if not self.is_valid_svn_pathfile(full_path, verbose):
+            raise SitExceptionDecode("Path does not exist: " + full_path)
+            
         return data
         
     ###############################################################
@@ -919,23 +972,28 @@ class sit_c:
             except SitExceptionDecode as e:
                 raise SitExceptionDecode("Could not decode path TO <" + to_branch + "/" + to_path + "> because:\n  " + str(e))
         except SitExceptionDecode as e:
+            if verbose:
+                self.tools.debug("DEF: Path not decoded successfully !\n" + str(e))
+                
             raise SitExceptionDecode("Could not decode because:\n  " + str(e))
-            return None
         else:
-            paths_try['from.path']          = path1_try['path']
-            paths_try['from.basepath']      = path1_try['basepath']
-            paths_try['from.subpath']       = path1_try['subpath']
-            paths_try['from.branch']        = path1_try['branch']
-            paths_try['from.revision']      = path1_try['revision']
-            paths_try['from.is_sandbox']    = path1_try['is_sandbox']
+            paths_try['from.path']              = path1_try['path']
+            paths_try['from.basepath']          = path1_try['basepath']
+            paths_try['from.subpath']           = path1_try['subpath']
+            paths_try['from.branch']            = path1_try['branch']
+            paths_try['from.revision']          = path1_try['revision']
+            paths_try['from.is_sandbox']        = path1_try['is_sandbox']
 
-            paths_try['to.path']          = path2_try['path']
-            paths_try['to.basepath']      = path2_try['basepath']
-            paths_try['to.subpath']       = path2_try['subpath']
-            paths_try['to.branch']        = path2_try['branch']
-            paths_try['to.revision']      = path2_try['revision']
-            paths_try['to.is_sandbox']    = path2_try['is_sandbox']
-            
+            paths_try['to.path']                = path2_try['path']
+            paths_try['to.basepath']            = path2_try['basepath']
+            paths_try['to.subpath']             = path2_try['subpath']
+            paths_try['to.branch']              = path2_try['branch']
+            paths_try['to.revision']            = path2_try['revision']
+            paths_try['to.is_sandbox']          = path2_try['is_sandbox']
+
+            if verbose:
+                self.tools.debug("DEF: Path decoded successfully !")
+                
             return paths_try
 
     ###############################################################
@@ -970,13 +1028,28 @@ class sit_c:
             return False
 
     ###############################################################
-    def get_link_if_path_or_file_is_symbolic(self, filepath, verbose):
-        p = re.compile('^.+\s+symbolic link to\s+(.+)\s*$')
+    def get_link_if_path_or_file_is_symbolic_via_file(self, filepath, verbose):
+        p1 = re.compile('^.+\s+symbolic link to\s+(.+)\s*$')
+        p2 = re.compile('^`(.+)\'$')
         link = None
         for line in self.tools.run_external_command_and_get_results('file ' + filepath, verbose):
+            m1 = p1.match(line)
+            if m1:
+                m2 = p2.match(m1.group(2))
+                if m2:
+                    link = m2.group(1)
+                else:
+                    link = m1.group(2)
+        return link
+
+    ###############################################################
+    def get_link_if_path_or_file_is_symbolic_via_ls(self, filepath, verbose):
+        p = re.compile('^l(.+)\s+->\s+(.+)\s*$')
+        link = None
+        for line in self.tools.run_external_command_and_get_results('ls -l ' + filepath, verbose):
             m = p.match(line)
             if m:
-                link = m.group(1)
+                link = m.group(2)
         return link
 
     ###############################################################
@@ -986,14 +1059,17 @@ class sit_c:
         m = p.match(path)
 
         try:
-            if m:
-                if revision != "":
-                    revision = "-r " + revision + " "
-                command = "svn ls --depth=infinity " + revision + path + " | grep /$ | sed 's,/$,,g' " # + ' || test $? = 1; }'
+            if m: # ^/.../ = remote
+                if (revision != "") and (revision != "BASE"):
+                    revision_option = "-r " + revision + " "
+                else:
+                    # if no revision is given base revisions are used ! so thats the thing we need in case of BASE revision
+                    revision_option = ""
+                command = "svn ls --depth=infinity " + revision_option + path + " | grep /$ | sed 's,/$,,g' " # + ' || test $? = 1; }'
                 for res in self.tools.run_external_command_and_get_results(command, verbose):
                     # self.tools.debug("CMD: " + command + " " + res)
                     data.append(res)
-            else:
+            else: # /.../  = local
                 path_to_use = path + "/"
                 # FIXME: better use status + svn ls of actual path with revision ?! we have lots of overhead if there are many local files !
                 # find . \( -not \( -wholename '*/.svn*' -o -wholename '*/repo*' \) -o -prune \) -type d -print
@@ -1031,9 +1107,11 @@ class sit_c:
             else:
                 data = []
                 items = 0
-                if revision != "":
-                    revision = "-r " + revision + " "
-                    command = "svn ls " + revision + path
+                if (revision != "") and (revision != "BASE"):
+                    revision_option = "-r " + revision + " "
+                else:
+                    revision_option = ""
+                command = "svn ls " + revision_option + path
                 for res in self.tools.run_external_command_and_get_results(command, verbose):
                     items = items + 1
                     data.append(res)
@@ -1046,7 +1124,7 @@ class sit_c:
                         single_file = True
                         
         except ToolException as e:
-            raise SitExceptionAbort("Folder detection failed:\n" + str(e))
+            raise SitExceptionAbort("Single file detection failed:\n" + str(e))
         
         return single_file
 
@@ -1062,7 +1140,7 @@ class sit_c:
     ###############################################################        
     def decode_status_data(self, status_data):
         status_data_decoded = {}
-        p = re.compile('^(M|A|D)(.*)\s+(' + '|'.join(base_paths) + ')(/\S+|)\s*$')
+        p = re.compile('^(M|A|D)(.*)\s+(' + '|'.join(base_paths) + ')(/.+|)\s*$')
         m = p.match(status_data)
         if m:
             status_data_decoded['status'] = m_deleted.group(1)
@@ -1252,6 +1330,40 @@ class sit_c:
         return data
 
     ###############################################################
+    def get_status_of_path_and_highest_revision(self, cmd, base_paths, verbose, debug):
+        data = self.get_status_of_path_empty()
+
+        highest_revision = 0
+        
+        try:
+            for res in self.tools.run_external_command_and_get_results(cmd, verbose):
+                if(debug):
+                    self.tools.debug("DIFF: " + res)
+                #    self.tools.debug('\n'.join(base_paths))
+                p_str = '^(M|A|D|!)(.*)\s+(\d+)\s+(' + '|'.join(base_paths) + ')/(\S+)\s*$'
+                p = re.compile(p_str)
+                # if(debug):
+                #     self.tools.debug("DIFFSTR: " + p_str)
+                m  = p.match(res)
+                if m:
+                    status = m.group(1)
+                    file = m.group(5)
+                    if status == "!":
+                        status = "D"
+                    data['matched'][file] = status
+                    if debug:
+                        self.tools.debug("Matched:   " + status + " <=> " + file)
+                    if m.group(3) > highest_revision:
+                        highest_revision = m.group(3)
+                else:
+                    data['not_matched'].append(res)
+                    if debug:
+                        self.tools.debug("Unmatched: " + res)
+        except ToolException as e:
+            raise SitExceptionAbort("Could add different files to data:\n" + str(e))
+        return data, highest_revision
+    
+    ###############################################################
     def convert_to_compare_folder_name(self, is_sandbox, branch_path, revision):
         if is_sandbox:
             return branch_path
@@ -1288,15 +1400,25 @@ class sit_c:
                     
                 self.tools.run_external_command('mkdir -p ' + compare_filepath_path, verbose)
                 if db[prefix + '.is_sandbox']:
-                    link = self.get_link_if_path_or_file_is_symbolic(db[prefix + '.basepath'] + "/" + filepath, verbose)
+                    link = self.get_link_if_path_or_file_is_symbolic_via_ls(db[prefix + '.basepath'] + "/" + filepath, verbose)
                     if link is None:
                         self.tools.run_external_command('cp -P ' + db[prefix + '.basepath'] + "/" + filepath + ' ' + compare_filepath, verbose)
                     else:
                         self.tools.run_external_command('echo "link ' + link + '" > ' + compare_filepath, verbose)
                 else:
                     # links are cat by svn to: "link <link_path>"
-                    self.tools.run_external_command('svn cat -r ' + db[prefix + '.revision'] + ' ' + db[prefix + ".basepath"] + "/" + filepath + ' > ' + compare_filepath, verbose)
-    
+                    if db[prefix + '.revision'] == "BASE":
+                        self.tools.run_external_command('svn cat ' + db[prefix + ".basepath"] + "/" + filepath + ' > ' + compare_filepath, verbose)
+                    else:
+                        self.tools.run_external_command('svn cat -r ' + db[prefix + '.revision'] + ' ' + db[prefix + ".basepath"] + "/" + filepath + ' > ' + compare_filepath, verbose)
+
+    ###############################################################
+    def merge_path(self, path_a, path_b):
+        if path_b == "":
+            return path_a
+        else:
+            return path_a + "/" + path_b
+                        
     ###############################################################
     def sit_diff(self, parameters):
         if(parameters['debug']):
@@ -1324,6 +1446,7 @@ class sit_c:
                     paths = paths_try
             
             elif len(parameters['branch_branch_pathfile'])==2:
+                # ---------------------------------------------------
                 # branch branch2/pathfile
             
                 try:
@@ -1335,7 +1458,8 @@ class sit_c:
                 except SitExceptionDecode as e:
                     trace[0] = "Could not decode <branch2 path> because:\n  " + str(e)
                 else:
-                    paths = paths_try
+                    trace[0] = "Could not decode <branch2 path> because:\n  Not yet supported complex sandbox diff."
+                    # paths = paths_try
                 
                 try:
                     paths_try = self.try_to_decode_branch_path(parameters['branch_branch_pathfile'][0], self.relative_path,
@@ -1351,11 +1475,13 @@ class sit_c:
                     raise SitExceptionDecode("Could not decode 2 arguments because:\n  " + trace[0] + "\n and \n  " + trace[1])
                 
             elif len(parameters['branch_branch_pathfile'])==1:
+                # ---------------------------------------------------
                 # branch/pathfile / branch
-            
+
+                # is parameter pathfile ?
                 try:
-                    paths_try = self.try_to_decode_branch_path(self.sandbox_branch_id,                    parameters['branch_branch_pathfile'][0],
-                                                               self.branch_type + ":" + self.branch_name, parameters['branch_branch_pathfile'][0],
+                    paths_try = self.try_to_decode_branch_path(self.sandbox_branch_id,                                   parameters['branch_branch_pathfile'][0],
+                                                               self.branch_type + ":" + self.branch_name + "@" + "BASE", parameters['branch_branch_pathfile'][0],
                                                                parameters['verbose'],
                                                                parameters['debug'])
                 
@@ -1363,7 +1489,8 @@ class sit_c:
                     trace[0] = "Could not decode <pathfile> because:\n  " + str(e)
                 else:
                     paths = paths_try
-                
+
+                # is parameter branch ?
                 try:
                     paths_try = self.try_to_decode_branch_path(self.sandbox_branch_id,                  self.relative_path,
                                                                parameters['branch_branch_pathfile'][0], self.relative_path,
@@ -1372,17 +1499,19 @@ class sit_c:
                 except SitExceptionDecode as e:
                     trace[1] = "Could not decode <branch> because:\n  " + str(e)
                 else:
-                    paths = paths_try
+                    trace[1] = "Could not decode <branch> because:\n  Not yet supported complex sandbox diff."
+                    # paths = paths_try
                         
                 if not paths:
                     raise SitExceptionDecode("Could not decode 1 arguments because:\n  " + trace[0] + "\n and \n  " + trace[1])
                     
             else:
-                # sandbox to head same branch for all
+                # ---------------------------------------------------
+                # sandbox to base same branch for all
 
                 try:
-                    paths_try = self.try_to_decode_branch_path(self.sandbox_branch_id                                                    , self.relative_path,
-                                                               self.branch_type + ":" + self.branch_name + "@" + self.repository_revision, self.relative_path,
+                    paths_try = self.try_to_decode_branch_path(self.sandbox_branch_id                                  , self.relative_path,
+                                                               self.branch_type + ":" + self.branch_name + "@" + "BASE", self.relative_path,
                                                                parameters['verbose'],
                                                                parameters['debug'])
             
@@ -1457,6 +1586,9 @@ class sit_c:
 
                 self.tools.process("Finding differences")
 
+                
+                
+                
                 # sandbox => detect differences to actual revision ? + differences from actual revision to target => what about reverts double changes ? ignore them ?
                 # do we need to find folders shouldn't we be able to detect them when calculating diffs ? at least that should be faster !
                 # FIXXME: we should detect type for all files/folders when we detect a change ?!
@@ -1466,10 +1598,10 @@ class sit_c:
                 if db['from.is_sandbox']:
                     if db['from.single_file']:
                         db['from.svndiff_path_base'] = self.relative_branch_root_url
-                        db['from.svndiff_path'] = self.relative_branch_root_url + "/" + self.decode_pathfile_absolute_to_sandbox_root_path(db['from.path']) + "@" + self.repository_revision
+                        db['from.svndiff_path'] = self.merge_path(self.relative_branch_root_url, self.decode_pathfile_absolute_to_sandbox_root_path(db['from.path'])) + "@" + "BASE"
                     else:
                         db['from.svndiff_path_base'] = self.relative_branch_root_url
-                        db['from.svndiff_path'] = self.relative_branch_root_url + "/" + db['from.subpath'] + "@" + self.repository_revision
+                        db['from.svndiff_path'] = self.merge_path(self.relative_branch_root_url, db['from.subpath']) + "@" + "BASE"
                         # self.decode_pathfile_relative_to_sandbox_root_path(self.relative_path)
                 else:
                     db['from.svndiff_path_base'] = db['from.path']
@@ -1478,31 +1610,35 @@ class sit_c:
                 if db['to.is_sandbox']:
                     if db['to.single_file']:
                         db['to.svndiff_path_base'] = self.relative_branch_root_url
-                        db['to.svndiff_path'] = self.relative_branch_root_url + "/" + self.decode_pathfile_absolute_to_sandbox_root_path(db['to.path']) + "@" + self.repository_revision
+                        db['to.svndiff_path'] = self.merge_path(self.relative_branch_root_url, self.decode_pathfile_absolute_to_sandbox_root_path(db['to.path'])) + "@" + "BASE"
                     else:
                         db['to.svndiff_path_base'] = self.relative_branch_root_url
-                        db['to.svndiff_path'] = self.relative_branch_root_url + "/" + db['to.subpath'] + "@" + self.repository_revision
+                        db['to.svndiff_path'] = self.merge_path(self.relative_branch_root_url, db['to.subpath']) + "@" + "BASE"
                         # self.decode_pathfile_relative_to_sandbox_root_path(self.relative_path)
                 else:
                     db['to.svndiff_path_base'] = db['to.path']
                     db['to.svndiff_path'] = db['to.path'] + "@" + db['to.revision']
 
                 if(parameters['debug']):
-                    self.tools.debug("====")
-                    self.tools.debug("Sandbox root:       " + self.sandbox_root_path)
                     self.tools.debug("")
-                    self.tools.debug("From Single file:   " + str(db['from.single_file']))
-                    self.tools.debug("From path:          " + db['from.path'])
-                    self.tools.debug("From basepath:      " + db['from.basepath'])
-                    self.tools.debug("From subpath:       " + db['from.subpath'])
-                    self.tools.debug("From svn path:      " + db['from.svndiff_path'])
+                    self.tools.debug("^^^^")
+                    self.tools.debug("Sandbox root:           " + self.sandbox_root_path)
                     self.tools.debug("")
-                    self.tools.debug("To Single file:     " + str(db['to.single_file']))
-                    self.tools.debug("To path:            " + db['to.path'])
-                    self.tools.debug("To basepath:        " + db['to.basepath'])
-                    self.tools.debug("To subpath:         " + db['to.subpath'])
-                    self.tools.debug("To svn path:        " + db['to.svndiff_path'])
-                    self.tools.debug("====")
+                    self.tools.debug("From Single file:       " + str(db['from.single_file']))
+                    self.tools.debug("From path:              " + db['from.path'])
+                    self.tools.debug("From basepath:          " + db['from.basepath'])
+                    self.tools.debug("From subpath:           " + db['from.subpath'])
+                    self.tools.debug("From svn path:          " + db['from.svndiff_path'])
+                    self.tools.debug("From svn path base:     " + db['from.svndiff_path_base'])
+                    self.tools.debug("")
+                    self.tools.debug("To Single file:         " + str(db['to.single_file']))
+                    self.tools.debug("To path:                " + db['to.path'])
+                    self.tools.debug("To basepath:            " + db['to.basepath'])
+                    self.tools.debug("To subpath:             " + db['to.subpath'])
+                    self.tools.debug("To svn path:            " + db['to.svndiff_path'])
+                    self.tools.debug("To svn path base:       " + db['to.svndiff_path_base'])
+                    self.tools.debug("vvvv")
+                    self.tools.debug("")
 
                 # =====================
                 # 3 Cases are possible:
@@ -1785,7 +1921,7 @@ class sit_c:
         command = "svn merge " + path + ' ' + revision + ' ' + self.get_relative_path_to_root()
         #self.tools.run_external_command(command, verbose) # does not work with interactive IO ! 
         try:
-            self.tools.run_external_command_no_print(command, verbose)
+            self.tools.run_external_command_print(command, verbose)
         except ToolException as e:
             raise SitExceptionAbort("Detected issue during merge:\n" + str(e))
             
@@ -2072,7 +2208,7 @@ class sit_c:
         else:
             #self.tools.process("Auto remove merge info")
             command = 'svn revert ' + self.get_relative_path_to_root()
-            self.tools.run_external_command_no_print(command, verbose)
+            self.tools.run_external_command_print(command, verbose)
 
     ###############################################################
     def do_get_head_revision(self, path, verbose=False):

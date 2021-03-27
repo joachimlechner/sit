@@ -65,6 +65,9 @@ class tools_c:
     def run_external_command(self, command, verbose=False):
         return self.do_run_external_command(command, verbose, False, True, True)
 
+    def run_external_command_print(self, command, verbose=False):
+        return self.do_run_external_command(command, verbose, False, True, False)
+    
     def run_external_command_no_print(self, command, verbose=False):
         return self.do_run_external_command(command, verbose, False, False, False)
 
@@ -77,7 +80,10 @@ class tools_c:
             self.info("Executing command: <" + command + ">")
         try:
             if get_results is False:
-                sp = subprocess.Popen(command, shell=True)
+                if print_line is True:
+                    sp = subprocess.Popen(command, shell=True)
+                else:
+                    sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 exit_code = sp.wait()
 
             else:
@@ -131,7 +137,7 @@ class tools_c:
             raise ToolException("Error during execution:\n " + str(e))
         
         if exit_code != 0:
-            raise ToolException("Command <" + command + "> failed")
+            raise ToolException("Command <" + command + "> failed with:\n" + '\n'.join(results))
         
         return results
     

@@ -21,12 +21,12 @@ A         project
 A         project/sub_project
 A         project/sub_project/sub_sub_project
 A         project/sub_project/sub_sub_project/sub_sub_sub_project
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
 Adding         project
 Adding         project/sub_project
 Adding         project/sub_project/sub_sub_project
@@ -61,7 +61,6 @@ Checked out revision 1.
  |============================================================================
 > Adding ...
 A         test
-A         test/test_file1
 A         test/test_file2
 A         test/sub_sub_test_link3
 A         test/sub_test_link
@@ -72,6 +71,7 @@ A         test/sub_sub_test3_data_link
 A         test/sub_test3
 A         test/sub_test3/sub_sub_test3
 A         test/sub_test3/sub_sub_test3/test_file3
+A         test/test_file1
 A         test_file4
 A         .sitconfig
  '============================================================================
@@ -187,19 +187,19 @@ D         test_file1
 > Detected 1 not mached elements:
 > Showing differences ...
 > To Path Tree:
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/sub_test_link
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file1
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test/sub_test_link
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test/test_file1
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test/test_file2
 > From Path Tree:
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
 > Differences:
-Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test: sub_test_link
-Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test: test_file1
-diff -s -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
+Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test: sub_test_link
+Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test: test_file1
+diff -s -r /tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test/test_file2 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
 1c1
 < test_data2
 ---
@@ -217,7 +217,7 @@ diff -s -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2 /tmp/sit.diff.<D
 > Detected 0 changed elements in from:
 > Detected 0 changed elements in to:
 > Detected 1 not mached elements:
-> No changes detected between paths <.../test_diff2/user1/test/sub_test@sandbox> and <^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/test/sub_test@2>.:
+> No changes detected between paths <.../test_diff2/user1/test/sub_test@sandbox> and <^/project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/test/sub_test@BASE>.:
  '============================================================================
 
 
@@ -243,19 +243,19 @@ M       test_file2
 > Detected 1 not mached elements:
 > Showing differences ...
 > To Path Tree:
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/sub_test_link
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file1
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test/sub_test_link
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test/test_file1
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test/test_file2
 > From Path Tree:
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
 > Differences:
-Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test: sub_test_link
-Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test: test_file1
-diff -s -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/test/test_file2 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
+Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test: sub_test_link
+Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test: test_file1
+diff -s -r /tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/test/test_file2 /tmp/sit.diff.<DATE_TIME>/from:sandbox/test/test_file2
 1c1
 < test_data2
 ---

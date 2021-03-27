@@ -108,25 +108,25 @@ D       file3
 > Detected 0 not mached elements:
 > Showing differences ...
 > To Path Tree:
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/file1
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/file2
-/tmp/sit.diff.<DATE_TIME>/to:trunk@2/file3
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/file1
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/file2
+/tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/file3
 > From Path Tree:
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/file1
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/file2
 > Differences:
-diff -s -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/file1 /tmp/sit.diff.<DATE_TIME>/from:sandbox/file1
+diff -s -r /tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/file1 /tmp/sit.diff.<DATE_TIME>/from:sandbox/file1
 1c1
 < file1
 ---
 > file_changed
-diff -s -r /tmp/sit.diff.<DATE_TIME>/to:trunk@2/file2 /tmp/sit.diff.<DATE_TIME>/from:sandbox/file2
+diff -s -r /tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/file2 /tmp/sit.diff.<DATE_TIME>/from:sandbox/file2
 1c1
 < file2
 ---
 > file_changed2
-Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@2/: file3
+Only in /tmp/sit.diff.<DATE_TIME>/to:trunk@BASE/: file3
  '============================================================================
 

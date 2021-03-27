@@ -21,12 +21,12 @@ A         project
 A         project/sub_project
 A         project/sub_project/sub_sub_project
 A         project/sub_project/sub_sub_project/sub_sub_sub_project
+A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/stashes
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/tags
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/releases
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk
 A         project/sub_project/sub_sub_project/sub_sub_sub_project/trunk/.svnignore
-A         project/sub_project/sub_sub_project/sub_sub_sub_project/branches
 Adding         project
 Adding         project/sub_project
 Adding         project/sub_project/sub_sub_project
@@ -61,9 +61,6 @@ Checked out revision 1.
  |============================================================================
 > Adding ...
 A         dir
-A         dir/file_in__dir
-A         dir/file_in__dir_to_modify__to_modify
-A         dir/file_in__dir_to_svn_remove__to_remove
 A         dir/file_in__dir_to_remove__to_modify
 A         dir/file_in__dir_to_modify__to_remove
 A         dir/file_in__dir__to_modify
@@ -72,6 +69,9 @@ A         dir/file_in__dir_to_svn_remove__to_modify
 A         dir/file_in__dir_to_remove__to_remove
 A         dir/file_in__dir__to_remove
 A         dir/file_in__dir_other__to_remove
+A         dir/file_in__dir
+A         dir/file_in__dir_to_modify__to_modify
+A         dir/file_in__dir_to_svn_remove__to_remove
 A         dir_link
 A         dir_other
 A         dir_other/file_in__dir_other
@@ -240,22 +240,22 @@ A         dir_to_add/file_in__dir_to_add
 > Detected 4 not mached elements:
 > Showing differences ...
 > To Path Tree:
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/dir_to_modify
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/dir_to_remove
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/dir_to_remove/file_in__dir_to_remove
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/dir_to_remove_link
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/dir_to_svn_remove
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/dir_to_svn_remove_link
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/empty_dir_to_modify
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/empty_dir_to_remove
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/empty_dir_to_svn_remove
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_link_to_modify
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_link_to_remove
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_link_to_svn_remove
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_to_modifiy
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_to_remove
-/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_to_svn_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/dir_to_modify
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/dir_to_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/dir_to_remove/file_in__dir_to_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/dir_to_remove_link
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/dir_to_svn_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/dir_to_svn_remove_link
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/empty_dir_to_modify
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/empty_dir_to_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/empty_dir_to_svn_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/file_link_to_modify
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/file_link_to_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/file_link_to_svn_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/file_to_modifiy
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/file_to_remove
+/tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/file_to_svn_remove
 > From Path Tree:
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/dir_to_add
@@ -269,33 +269,33 @@ A         dir_to_add/file_in__dir_to_add
 /tmp/sit.diff.<DATE_TIME>/from:sandbox/file_to_modifiy
 > Differences:
 Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: dir_to_add
-Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: dir_to_modify
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/: dir_to_modify
 Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: dir_to_modify_modified
-Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: dir_to_remove
-Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: dir_to_remove_link
-Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: dir_to_svn_remove
-Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: dir_to_svn_remove_link
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/: dir_to_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/: dir_to_remove_link
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/: dir_to_svn_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/: dir_to_svn_remove_link
 Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: empty_dir_to_add
-Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: empty_dir_to_modify
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/: empty_dir_to_modify
 Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: empty_dir_to_modify_modified
-Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: empty_dir_to_remove
-Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: empty_dir_to_svn_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/: empty_dir_to_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/: empty_dir_to_svn_remove
 Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: file_link_to_add
-diff -s -r /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_link_to_modify /tmp/sit.diff.<DATE_TIME>/from:sandbox/file_link_to_modify
+diff -s -r /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/file_link_to_modify /tmp/sit.diff.<DATE_TIME>/from:sandbox/file_link_to_modify
 1c1
 < link file
 \ No newline at end of file
 ---
 > link file_other
-Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: file_link_to_remove
-Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: file_link_to_svn_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/: file_link_to_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/: file_link_to_svn_remove
 Only in /tmp/sit.diff.<DATE_TIME>/from:sandbox/: file_to_add
-diff -s -r /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/file_to_modifiy /tmp/sit.diff.<DATE_TIME>/from:sandbox/file_to_modifiy
+diff -s -r /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/file_to_modifiy /tmp/sit.diff.<DATE_TIME>/from:sandbox/file_to_modifiy
 1c1
 < file_to_modify
 ---
 > file_to_modify => modified
-Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: file_to_remove
-Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@3/: file_to_svn_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/: file_to_remove
+Only in /tmp/sit.diff.<DATE_TIME>/to:branches__<user>.test@BASE/: file_to_svn_remove
  '============================================================================
 
